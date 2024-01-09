@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oweflow/screens/accountpages/add_contact.dart';
+import 'package:oweflow/screens/accountpages/show_contact.dart';
 import 'package:oweflow/utils/colors.dart';
 
 class AddSchedules extends StatefulWidget {
@@ -64,7 +65,7 @@ class _AddSchedulesState extends State<AddSchedules> {
             InkWell(
               onTap: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (builder) => AddContact()));
+                    MaterialPageRoute(builder: (builder) => ShowContact()));
               },
               child: Text(
                 'Add Contact',
