@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oweflow/screens/accountpages/show_contact.dart';
+import 'package:oweflow/screens/main_dashboard.dart';
 import 'package:oweflow/utils/colors.dart';
 import 'package:intl/intl.dart';
+import 'package:uuid/uuid.dart';
 
 class AddSchedules extends StatefulWidget {
   const AddSchedules({super.key});
@@ -16,6 +19,7 @@ class _AddSchedulesState extends State<AddSchedules> {
   TextEditingController _emailController = TextEditingController();
   String dropdownValue = "Does not repeat";
   String remainders = "Disabled";
+  bool isLoading = false;
   List<String> listRecrudesce = <String>[
     'Does not repeat',
     'Every 2 weeks',
@@ -363,33 +367,74 @@ class _AddSchedulesState extends State<AddSchedules> {
                       )),
                 ],
               ),
-              Container(
-                margin: EdgeInsets.only(top: 20),
-                width: 343,
-                height: 56,
-                padding: const EdgeInsets.all(8),
-                decoration: ShapeDecoration(
-                  color: textColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Save',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.inter(
-                        color: colorwhite,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        height: 0,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: GestureDetector(
+                  onTap: () async {
+                    var uuid = Uuid().v4();
+                    if (_emailController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Amount is Required")));
+                    } else if (_dateController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Date is Required")));
+                    } else {
+                      setState(() {
+                        isLoading = true;
+                      });
+                      await FirebaseFirestore.instance
+                          .collection("schedules")
+                          .doc(uuid)
+                          .set({
+                        "userID": FirebaseAuth.instance.currentUser!.uid,
+                        "uuid": uuid,
+                        "contact": selectedContacts,
+                        "amount": _emailController.text.trim(),
+                        "date": _dateController.text.trim(),
+                        "notes": _notesController.text ?? "",
+                        "remainder": remainders,
+                        "recurrence": dropdownValue
+                      });
+                      setState(() {
+                        isLoading = false;
+                      });
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (builder) => MainDashboard()));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Schedule is Created")));
+                    }
+                  },
+                  child: Container(
+                    margin: EdgeInsets.only(top: 20),
+                    width: 343,
+                    height: 56,
+                    padding: const EdgeInsets.all(8),
+                    decoration: ShapeDecoration(
+                      color: textColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
                     ),
-                  ],
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Save',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.inter(
+                            color: colorwhite,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            height: 0,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ],
