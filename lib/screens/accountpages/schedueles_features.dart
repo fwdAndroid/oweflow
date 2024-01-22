@@ -1,6 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oweflow/screens/accountpages/add_schedule.dart';
+import 'package:oweflow/screens/main_dashboard.dart';
 import 'package:oweflow/utils/colors.dart';
 
 class SchedulesFeatures extends StatefulWidget {
@@ -71,46 +74,119 @@ class _SchedulesFeaturesState extends State<SchedulesFeatures> {
             ),
             SizedBox(
               height: MediaQuery.of(context).size.height / 1.2,
-              child: ListView.builder(
-                  itemBuilder: (BuildContext context, int index) {
-                return Column(
-                  children: [
-                    ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: AssetImage("assets/splash.png"),
-                      ),
-                      trailing: Text(
-                        '5345\$',
-                        style: GoogleFonts.workSans(
-                          color: Color(0xFF6C757D),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          height: 0,
+              child: StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection("schedules")
+                      .where("userID",
+                          isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                    if (snapshot.data!.docs.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          "No Schedules Found yet",
+                          style: TextStyle(color: Colors.white),
                         ),
-                      ),
-                      title: Text(
-                        'Schedule 2134',
-                        style: GoogleFonts.workSans(
-                          color: colorwhite,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          height: 0,
-                        ),
-                      ),
-                      subtitle: Text(
-                        'Created At 23 September 2032',
-                        style: GoogleFonts.workSans(
-                          color: colorwhite,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          height: 0,
-                        ),
-                      ),
-                    ),
-                    Divider()
-                  ],
-                );
-              }),
+                      );
+                    }
+                    return ListView.builder(
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return StreamBuilder<Object>(
+                              stream: FirebaseFirestore.instance
+                                  .collection("schedules")
+                                  .where("userID",
+                                      isEqualTo: FirebaseAuth
+                                          .instance.currentUser!.uid)
+                                  .snapshots(),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot snapshot) {
+                                if (!snapshot.hasData) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                }
+                                final List<DocumentSnapshot> documents =
+                                    snapshot.data!.docs;
+                                final Map<String, dynamic> data =
+                                    documents[index].data()
+                                        as Map<String, dynamic>;
+                                return Column(
+                                  children: [
+                                    ListTile(
+                                      title: Text(
+                                        data['contact'][index],
+                                        style: TextStyle(
+                                            color: colorwhite,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                      subtitle: Text(
+                                        data['amount'],
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                      trailing: IconButton(
+                                          onPressed: () async {
+                                            showDialog<void>(
+                                              context: context,
+                                              barrierDismissible:
+                                                  false, // user must tap button!
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  title: Text('Delete Alert'),
+                                                  content: Column(
+                                                    children: [
+                                                      Text(
+                                                        "Do you want to delete the schedule ?",
+                                                        style: TextStyle(
+                                                            color: colorwhite),
+                                                      )
+                                                    ],
+                                                  ),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () async {
+                                                        await FirebaseFirestore
+                                                            .instance
+                                                            .collection(
+                                                                "schedules")
+                                                            .doc(data['uuid'])
+                                                            .delete();
+                                                        Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                                builder:
+                                                                    (builder) =>
+                                                                        MainDashboard()));
+                                                      },
+                                                      child: Text('Yes'),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text('No'),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                          },
+                                          icon: Icon(Icons.delete)),
+                                    ),
+                                    Divider(
+                                      color: colorwhite.withOpacity(.2),
+                                    )
+                                  ],
+                                );
+                              });
+                        });
+                  }),
             ),
           ],
         ),
