@@ -154,93 +154,38 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ],
                           ),
-
-                          //               Column(
-                          //                 children: [
-                          //                   Row(
-                          //                     children: [
-                          //                       Icon(
-                          //                         Icons.arrow_upward,
-                          //                         color: colorwhite,
-                          //                       ),
-                          //                       Text(
-                          //                         'Lenders',
-                          //                         style: GoogleFonts.inter(
-                          //                           color: colorwhite,
-                          //                           fontSize: 16,
-                          //                           fontWeight: FontWeight.w600,
-                          //                           height: 0,
-                          //                           letterSpacing: -0.32,
-                          //                         ),
-                          //                       ),
-                          //                     ],
-                          //                   ),
-                          //                   Text(
-                          //                     '\$ 1,840.00',
-                          //                     style: GoogleFonts.inter(
-                          //                       color: colorwhite,
-                          //                       fontSize: 20,
-                          //                       fontWeight: FontWeight.w600,
-                          //                       height: 0,
-                          //                       letterSpacing: -1,
-                          //                     ),
-                          //                   ),
-                          //                 ],
-                          //               )
-                          //             ],
-                          //           ),
-                          //         ],
-                          //       ),
-                          //     ),
-                          //   ),
-                          // ),
-                          // Expanded(
-                          //   child: DefaultTabController(
-                          //     length: 2,
-                          //     child: Scaffold(
-                          //       backgroundColor: appBarColor,
-                          //       appBar: PreferredSize(
-                          //         preferredSize: Size.fromHeight(10),
-                          //         child: Column(
-                          //           children: [
-                          //             Padding(
-                          //               padding: const EdgeInsets.all(4.0),
-                          //               child: TabBar(
-                          //                   indicatorColor: textColor,
-                          //                   labelColor: textColor,
-                          //                   tabs: [
-                          //                     Text(
-                          //                       'Borrowers',
-                          //                       style: GoogleFonts.inter(
-                          //                         fontSize: 20,
-                          //                         fontWeight: FontWeight.w600,
-                          //                         height: 0,
-                          //                         letterSpacing: -0.40,
-                          //                       ),
-                          //                     ),
-                          //                     Text(
-                          //                       'Lenders',
-                          //                       style: GoogleFonts.inter(
-                          //                         fontSize: 20,
-                          //                         fontWeight: FontWeight.w600,
-                          //                         height: 0,
-                          //                         letterSpacing: -0.40,
-                          //                       ),
-                          //                     ),
-                          //                   ]),
-                          //             )
-                          //           ],
-                          //         ),
-                          //       ),
-                          //       body: TabBarView(
-                          //         children: [
-                          //           Borrowers(),
-                          //           Lenders(),
-                          //         ],
-                          //       ),
-                          //     ),
-                          //   ),
-                          // ),
+                          Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.arrow_upward,
+                                    color: colorwhite,
+                                  ),
+                                  Text(
+                                    'Lenders',
+                                    style: GoogleFonts.inter(
+                                      color: colorwhite,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      height: 0,
+                                      letterSpacing: -0.32,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                '\$ 1,840.00',
+                                style: GoogleFonts.inter(
+                                  color: colorwhite,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                  height: 0,
+                                  letterSpacing: -1,
+                                ),
+                              ),
+                            ],
+                          )
                         ],
                       ),
                     ],
@@ -248,11 +193,53 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            Image.asset(
-              "assets/Group 239010 (1).png",
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height / 2,
-            )
+            Expanded(
+              child: DefaultTabController(
+                length: 2,
+                child: Scaffold(
+                  backgroundColor: appBarColor,
+                  appBar: PreferredSize(
+                    preferredSize: Size.fromHeight(10),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: TabBar(
+                              indicatorColor: textColor,
+                              labelColor: textColor,
+                              tabs: [
+                                Text(
+                                  'Borrowers',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600,
+                                    height: 0,
+                                    letterSpacing: -0.40,
+                                  ),
+                                ),
+                                Text(
+                                  'Lenders',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600,
+                                    height: 0,
+                                    letterSpacing: -0.40,
+                                  ),
+                                ),
+                              ]),
+                        )
+                      ],
+                    ),
+                  ),
+                  body: TabBarView(
+                    children: [
+                      Borrowers(),
+                      Lenders(),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
