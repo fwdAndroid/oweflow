@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oweflow/screens/accountpages/noti.dart';
 import 'package:oweflow/screens/accountpages/premium_features.dart';
+import 'package:oweflow/screens/main_dashboard.dart';
 import 'package:oweflow/screens/premiumfeatues/goals/add_goals.dart';
 import 'package:oweflow/utils/colors.dart';
 
@@ -167,34 +170,126 @@ class _FinancialGoalsState extends State<FinancialGoals> {
             padding: const EdgeInsets.all(8.0),
             child: SizedBox(
               height: MediaQuery.of(context).size.height / 3,
-              child: ListView.builder(
-                  itemCount: 5,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Card(
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: AssetImage("assets/splash.png"),
+              child: StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection("goals")
+                      .where("uid",
+                          isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                    if (snapshot.data!.docs.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          "No Goals Found yet",
+                          style: TextStyle(color: Colors.white),
                         ),
-                        title: Text(
-                          'Lenders',
-                          style: GoogleFonts.lato(
-                            color: black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            height: 0,
-                          ),
-                        ),
-                        subtitle: Text(
-                          'Jan 12, 2022',
-                          style: GoogleFonts.lato(
-                            color: borderColor,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w400,
-                            height: 0,
-                          ),
-                        ),
-                      ),
-                    );
+                      );
+                    }
+                    return ListView.builder(
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return StreamBuilder<Object>(
+                              stream: FirebaseFirestore.instance
+                                  .collection("goals")
+                                  .where("uid",
+                                      isEqualTo: FirebaseAuth
+                                          .instance.currentUser!.uid)
+                                  .snapshots(),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot snapshot) {
+                                if (!snapshot.hasData) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                }
+                                final List<DocumentSnapshot> documents =
+                                    snapshot.data!.docs;
+                                final Map<String, dynamic> data =
+                                    documents[index].data()
+                                        as Map<String, dynamic>;
+                                return Column(
+                                  children: [
+                                    ListTile(
+                                      leading: Text(
+                                        "\$" + data['amount'],
+                                        style: TextStyle(
+                                            color: colorwhite,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                      title: Text(
+                                        data['name'],
+                                        style: TextStyle(
+                                            color: colorwhite,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                      subtitle: Text(
+                                        data['date'],
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                      trailing: IconButton(
+                                          onPressed: () async {
+                                            showDialog<void>(
+                                              context: context,
+                                              barrierDismissible:
+                                                  false, // user must tap button!
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  title: Text('Delete Alert'),
+                                                  content: Column(
+                                                    children: [
+                                                      Text(
+                                                        "Do you want to delete the goal ?",
+                                                        style: TextStyle(
+                                                            color: colorwhite),
+                                                      )
+                                                    ],
+                                                  ),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () async {
+                                                        await FirebaseFirestore
+                                                            .instance
+                                                            .collection("goals")
+                                                            .doc(data['uuid'])
+                                                            .delete();
+                                                        Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                                builder:
+                                                                    (builder) =>
+                                                                        MainDashboard()));
+                                                      },
+                                                      child: Text('Yes'),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text('No'),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                          },
+                                          icon: Icon(
+                                            Icons.delete,
+                                            color: Colors.red,
+                                          )),
+                                    ),
+                                    Divider(
+                                      color: colorwhite.withOpacity(.2),
+                                    )
+                                  ],
+                                );
+                              });
+                        });
                   }),
             ),
           ),
