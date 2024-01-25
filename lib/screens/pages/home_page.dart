@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oweflow/screens/accountpages/noti.dart';
@@ -32,53 +34,67 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(
               height: 30,
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Enjelin Morgeana',
-                    style: GoogleFonts.inter(
-                      color: colorwhite,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (builder) => PremiumFeatures()));
-                        },
-                        child: Image.asset(
-                          "assets/menu.png",
-                          height: 30,
-                          width: 30,
+            StreamBuilder<Object>(
+                stream: FirebaseFirestore.instance
+                    .collection("users")
+                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                    .snapshots(),
+                builder: (context, AsyncSnapshot snapshot) {
+                  if (!snapshot.hasData) {
+                    return new CircularProgressIndicator();
+                  }
+                  var document = snapshot.data;
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          document['firstName'] + " " + document['lastName'],
+                          style: GoogleFonts.inter(
+                            color: colorwhite,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (builder) => Noti()));
-                        },
-                        child: Image.asset("assets/noti.png",
-                            height: 30, width: 30),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ),
+                        Row(
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (builder) =>
+                                            PremiumFeatures()));
+                              },
+                              child: Image.asset(
+                                "assets/menu.png",
+                                height: 30,
+                                width: 30,
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (builder) => Noti()));
+                              },
+                              child: Image.asset("assets/noti.png",
+                                  height: 30, width: 30),
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  );
+                }),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Container(

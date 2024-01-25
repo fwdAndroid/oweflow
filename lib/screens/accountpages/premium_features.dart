@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oweflow/screens/accountpages/currency_exchange.dart';
@@ -95,16 +97,25 @@ class _PremiumFeaturesState extends State<PremiumFeatures> {
           const SizedBox(
             height: 40,
           ),
-          Text(
-            'Enjelin Morgeana',
-            textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
-              color: colorwhite,
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              height: 0,
-            ),
-          ),
+          StreamBuilder<Object>(
+              stream: FirebaseFirestore.instance
+                  .collection("users")
+                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                  .snapshots(),
+              builder: (context, AsyncSnapshot snapshot) {
+                if (!snapshot.hasData) {
+                  return new CircularProgressIndicator();
+                }
+                var document = snapshot.data;
+                return Text(
+                  document['firstName'] + " " + document['lastName'],
+                  style: GoogleFonts.inter(
+                    color: colorwhite,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                  ),
+                );
+              }),
           const SizedBox(
             height: 30,
           ),
