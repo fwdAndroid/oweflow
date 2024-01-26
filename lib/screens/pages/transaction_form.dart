@@ -414,7 +414,7 @@ class _TransactionFormState extends State<TransactionForm> {
                           "userID": FirebaseAuth.instance.currentUser!.uid,
                           "uuid": uuid,
                           "contact": selectedContacts,
-                          "amount": _amountController.text.trim(),
+                          "amount": int.parse(_amountController.text),
                           "date": _dateController.text.trim(),
                           "notes": _notesController.text,
                         });

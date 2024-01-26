@@ -4,18 +4,25 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oweflow/screens/accountpages/noti.dart';
 import 'package:oweflow/screens/accountpages/premium_features.dart';
-import 'package:oweflow/screens/pages/tab_pages/browers.dart';
-import 'package:oweflow/screens/pages/tab_pages/lenders.dart';
 import 'package:oweflow/utils/colors.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomePage> createState() => Debtors();
 }
 
-class _HomePageState extends State<HomePage> {
+class Debtors extends State<HomePage> {
+  var totalAmount = 0;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    calculateTotalAmount();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,6 +37,7 @@ class _HomePageState extends State<HomePage> {
                 fit: BoxFit.cover,
                 filterQuality: FilterQuality.high)),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(
               height: 30,
@@ -95,6 +103,8 @@ class _HomePageState extends State<HomePage> {
                     ),
                   );
                 }),
+
+            //Debits Detals
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Container(
@@ -123,7 +133,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       Text(
-                        '\$ 2,548.00',
+                        '\$$totalAmount',
                         style: GoogleFonts.inter(
                           color: Colors.white,
                           fontSize: 30,
@@ -135,130 +145,155 @@ class _HomePageState extends State<HomePage> {
                       const SizedBox(
                         height: 10,
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      Column(
                         children: [
-                          Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.arrow_downward,
-                                    color: colorwhite,
-                                  ),
-                                  Text(
-                                    'Borrowers',
-                                    style: GoogleFonts.inter(
-                                      color: textColor,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      height: 0,
-                                      letterSpacing: -0.32,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                '\$ 1,840.00',
-                                style: GoogleFonts.inter(
-                                  color: colorwhite,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
-                                  height: 0,
-                                  letterSpacing: -1,
-                                ),
-                              ),
-                            ],
+                          Text(
+                            'Total Borrowers',
+                            style: GoogleFonts.inter(
+                              color: textColor,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              height: 0,
+                              letterSpacing: -0.32,
+                            ),
                           ),
-                          Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.arrow_upward,
-                                    color: colorwhite,
-                                  ),
-                                  Text(
-                                    'Lenders',
-                                    style: GoogleFonts.inter(
-                                      color: colorwhite,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      height: 0,
-                                      letterSpacing: -0.32,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                '\$ 1,840.00',
-                                style: GoogleFonts.inter(
-                                  color: colorwhite,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
-                                  height: 0,
-                                  letterSpacing: -1,
-                                ),
-                              ),
-                            ],
-                          )
                         ],
                       ),
+                      FutureBuilder(
+                          future: docss(),
+                          builder: (context, snapshot) {
+                            return Text(
+                              snapshot.data.toString(),
+                              style: GoogleFonts.inter(
+                                color: Colors.white,
+                                fontSize: 30,
+                                fontWeight: FontWeight.w700,
+                                height: 0,
+                                letterSpacing: -1.50,
+                              ),
+                              textAlign: TextAlign.left,
+                            );
+                          }),
                     ],
                   ),
                 ),
               ),
             ),
-            Expanded(
-              child: DefaultTabController(
-                length: 2,
-                child: Scaffold(
-                  backgroundColor: appBarColor,
-                  appBar: PreferredSize(
-                    preferredSize: Size.fromHeight(10),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: TabBar(
-                              indicatorColor: textColor,
-                              labelColor: textColor,
-                              tabs: [
-                                Text(
-                                  'Borrowers',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600,
-                                    height: 0,
-                                    letterSpacing: -0.40,
-                                  ),
-                                ),
-                                Text(
-                                  'Lenders',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600,
-                                    height: 0,
-                                    letterSpacing: -0.40,
-                                  ),
-                                ),
-                              ]),
-                        )
-                      ],
-                    ),
-                  ),
-                  body: TabBarView(
-                    children: [
-                      Borrowers(),
-                      Lenders(),
-                    ],
-                  ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'Debits',
+                style: GoogleFonts.inter(
+                  color: colorwhite,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  height: 0,
+                  letterSpacing: -0.40,
                 ),
+                textAlign: TextAlign.left,
+              ),
+            ),
+            SizedBox(
+              height: MediaQuery.of(context).size.height / 2.3,
+              child: StreamBuilder(
+                stream: getContactsStream(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                  if (snapshot.data!.docs.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        "No Debtors Details Available",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    );
+                  }
+                  return ListView.builder(
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final List<DocumentSnapshot> documents =
+                          snapshot.data!.docs;
+                      final Map<String, dynamic> data =
+                          documents[index].data() as Map<String, dynamic>;
+                      String contactNames = data['contact'].join(', ');
+                      return Column(
+                        children: [
+                          ListTile(
+                            title: Text(
+                              'Name: $contactNames',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            subtitle: Text(
+                              'Amount: ${data['amount'].toString()}' + "\$",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            // Add more fields as needed
+                            trailing: TextButton(
+                                onPressed: () {},
+                                child: Text(
+                                  "Actions",
+                                  style: TextStyle(color: textColor),
+                                )),
+                          ),
+                          Divider()
+                        ],
+                      );
+                    },
+                  );
+                },
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+//Functions
+  //Contact List
+  Stream<QuerySnapshot> getContactsStream() {
+    return FirebaseFirestore.instance
+        .collection("debitTransaction")
+        .where("userID", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .snapshots();
+  }
+
+  //Number of Debitors
+  docss() async {
+    AggregateQuerySnapshot query = await FirebaseFirestore.instance
+        .collection('debitTransaction')
+        .where("userID", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .count()
+        .get();
+
+    int numberOfDocuments = query.count;
+    return numberOfDocuments;
+  }
+
+  //Total Amount
+  Future<void> calculateTotalAmount() async {
+    // Query Firestore to calculate total amount
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('debitTransaction') // Replace with your collection name
+          .where('userID', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+          .get();
+
+      double total = 0.0;
+
+      querySnapshot.docs.forEach((doc) {
+        total +=
+            (doc['amount'] ?? 0.0); // Replace 'amount' with your field name
+      });
+
+      setState(() {
+        totalAmount = total.toInt();
+      });
+    } catch (e) {
+      print('Error calculating total amount: $e');
+    }
   }
 }
