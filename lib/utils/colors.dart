@@ -8,3 +8,4 @@ final textColor = Color(0xffE3823C);
 final red = Color(0xFFF95B51);
 final c = Color(0xFF666666);
 final b = Color(0xffE84040);
+final g = Colors.green;

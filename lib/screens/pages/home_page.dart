@@ -232,10 +232,75 @@ class Debtors extends State<HomePage> {
                             ),
                             // Add more fields as needed
                             trailing: TextButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  showDialog<void>(
+                                    context: context,
+                                    barrierDismissible:
+                                        false, // user must tap button!
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: const Text('Debt Information'),
+                                        content: SingleChildScrollView(
+                                          child: ListTile(
+                                            title: Text(
+                                              contactNames.toString(),
+                                              style:
+                                                  TextStyle(color: borderColor),
+                                            ),
+                                            subtitle: Text(
+                                              data['date'],
+                                              style:
+                                                  TextStyle(color: borderColor),
+                                            ),
+                                            trailing: Text(
+                                              '${data['amount'].toString()}' +
+                                                  "\$",
+                                              style:
+                                                  TextStyle(color: borderColor),
+                                            ),
+                                          ),
+                                        ),
+                                        actions: <Widget>[
+                                          TextButton(
+                                            child: const Text('Done'),
+                                            onPressed: () async {
+                                              print("object");
+                                              await FirebaseFirestore.instance
+                                                  .collection(
+                                                      "closedTransaction")
+                                                  .doc(data['uuid'])
+                                                  .set(
+                                                {
+                                                  "status": "closed",
+                                                  "amount": 0,
+                                                  "notes": data['notes'],
+                                                  "userID": data['userID'],
+                                                  "uuid": data['uuid'],
+                                                  "contact": contactNames,
+                                                  "date": data['date']
+                                                },
+                                              );
+                                              await FirebaseFirestore.instance
+                                                  .collection(
+                                                      "debitTransaction")
+                                                  .doc(data['uuid'])
+                                                  .delete();
+                                            },
+                                          ),
+                                          TextButton(
+                                            child: const Text('close'),
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
                                 child: Text(
-                                  "Actions",
-                                  style: TextStyle(color: textColor),
+                                  "Mark as Complete",
+                                  style: TextStyle(color: g),
                                 )),
                           ),
                           Divider()
