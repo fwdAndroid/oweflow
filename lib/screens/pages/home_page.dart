@@ -285,6 +285,7 @@ class Debtors extends State<HomePage> {
                                                       "debitTransaction")
                                                   .doc(data['uuid'])
                                                   .delete();
+                                              Navigator.of(context).pop();
                                             },
                                           ),
                                           TextButton(
