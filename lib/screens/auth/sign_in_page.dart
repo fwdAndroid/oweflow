@@ -18,35 +18,56 @@ class _SignInPageState extends State<SignInPage> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _obscureText = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: black,
-      body: Container(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        decoration: BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage(
-                  "assets/splash.png",
-                ),
-                fit: BoxFit.cover,
-                filterQuality: FilterQuality.high)),
+      backgroundColor: colorwhite,
+      body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Image.asset(
-              "assets/uiux logos 1.png",
-              height: 300,
-              width: 200,
-              fit: BoxFit.cover,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Align(
+                alignment: AlignmentDirectional.topStart,
+                child: Text(
+                  'Sign in to your Account',
+                  style: GoogleFonts.plusJakartaSans(
+                      color: black, fontWeight: FontWeight.w600, fontSize: 32),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Align(
+                alignment: AlignmentDirectional.topStart,
+                child: Text(
+                  'Sign in to your Account',
+                  style: GoogleFonts.plusJakartaSans(
+                      color: Color(0xff7E94B4),
+                      fontWeight: FontWeight.w500,
+                      fontSize: 16),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0, left: 16),
+              child: Align(
+                alignment: AlignmentDirectional.topStart,
+                child: Text(
+                  'Your Email',
+                  style: GoogleFonts.plusJakartaSans(
+                      color: black, fontWeight: FontWeight.w500, fontSize: 14),
+                ),
+              ),
             ),
             Container(
               margin: const EdgeInsets.only(left: 10, right: 10),
               padding: const EdgeInsets.all(8),
               child: TextFormField(
                 controller: _emailController,
-                style: GoogleFonts.dmSans(color: colorwhite),
+                style: GoogleFonts.plusJakartaSans(color: black),
                 decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: borderColor)),
@@ -57,17 +78,39 @@ class _SignInPageState extends State<SignInPage> {
                     border: OutlineInputBorder(
                         borderSide: BorderSide(color: borderColor)),
                     hintText: "Enter Email Address",
-                    hintStyle:
-                        GoogleFonts.dmSans(color: colorwhite, fontSize: 12)),
+                    hintStyle: GoogleFonts.plusJakartaSans(
+                        color: black, fontSize: 12)),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 10.0, left: 16),
+              child: Align(
+                alignment: AlignmentDirectional.topStart,
+                child: Text(
+                  'Password',
+                  style: GoogleFonts.plusJakartaSans(
+                      color: black, fontWeight: FontWeight.w500, fontSize: 14),
+                ),
               ),
             ),
             Container(
               margin: const EdgeInsets.only(left: 10, right: 10),
               padding: const EdgeInsets.all(8),
               child: TextFormField(
+                obscureText: _obscureText,
                 controller: _passwordController,
-                style: GoogleFonts.dmSans(color: colorwhite),
+                style: GoogleFonts.plusJakartaSans(color: black),
                 decoration: InputDecoration(
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscureText ? Icons.visibility : Icons.visibility_off,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscureText = !_obscureText;
+                        });
+                      },
+                    ),
                     enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: borderColor)),
                     errorBorder: OutlineInputBorder(
@@ -77,8 +120,8 @@ class _SignInPageState extends State<SignInPage> {
                     border: OutlineInputBorder(
                         borderSide: BorderSide(color: borderColor)),
                     hintText: "Enter Password",
-                    hintStyle:
-                        GoogleFonts.dmSans(color: colorwhite, fontSize: 12)),
+                    hintStyle: GoogleFonts.plusJakartaSans(
+                        color: black, fontSize: 12)),
               ),
             ),
             const SizedBox(
@@ -132,10 +175,11 @@ class _SignInPageState extends State<SignInPage> {
                       },
                       child: Text(
                         "Forgot Password",
-                        style: GoogleFonts.dmSans(
-                            color: colorwhite,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold),
+                        style: GoogleFonts.plusJakartaSans(
+                          color: buttonColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
                       )),
                 ),
               ),
@@ -151,16 +195,16 @@ class _SignInPageState extends State<SignInPage> {
                   children: [
                     TextSpan(
                       text: "Don't have an account? ",
-                      style: GoogleFonts.dmSans(
-                        color: colorwhite,
+                      style: GoogleFonts.plusJakartaSans(
+                        color: black,
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     TextSpan(
-                      text: 'Sign Up',
-                      style: GoogleFonts.dmSans(
-                        color: colorwhite,
+                      text: 'Register',
+                      style: GoogleFonts.plusJakartaSans(
+                        color: buttonColor,
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                       ),

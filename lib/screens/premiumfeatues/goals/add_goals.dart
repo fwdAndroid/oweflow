@@ -5,6 +5,7 @@ import 'package:oweflow/screens/accountpages/noti.dart';
 import 'package:oweflow/screens/accountpages/premium_features.dart';
 import 'package:oweflow/screens/premiumfeatues/financialgoals.dart';
 import 'package:oweflow/services/database.dart';
+import 'package:oweflow/utils/buttons.dart';
 import 'package:oweflow/utils/colors.dart';
 
 class AddGoals extends StatefulWidget {
@@ -23,221 +24,214 @@ class _AddGoalsState extends State<AddGoals> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Container(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height,
-      decoration: BoxDecoration(
-          image: DecorationImage(
-              image: AssetImage(
-                "assets/back.png",
-              ),
-              fit: BoxFit.cover,
-              filterQuality: FilterQuality.high)),
-      child: Column(
-        children: [
-          const SizedBox(
-            height: 40,
+        appBar: AppBar(
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Icon(
+                Icons.arrow_back,
+                color: black,
+              )),
+          centerTitle: true,
+          title: Text(
+            "Add Goals",
+            style: GoogleFonts.plusJakartaSans(
+                color: black, fontWeight: FontWeight.w500, fontSize: 16),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: Icon(
-                      Icons.arrow_back_ios,
-                      color: colorwhite,
-                    )),
-                Text(
-                  'Add Goads',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    color: colorwhite,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    height: 0,
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 40,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0, left: 16),
+                child: Align(
+                  alignment: AlignmentDirectional.topStart,
+                  child: Text(
+                    'Goal Name',
+                    style: GoogleFonts.plusJakartaSans(
+                        color: black,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12),
                   ),
                 ),
-                Row(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (builder) => Noti()));
-                      },
-                      child: Image.asset(
-                        "assets/noti.png",
-                        height: 30,
-                        width: 30,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (builder) => PremiumFeatures()));
-                      },
-                      child: Image.asset(
-                        "assets/menu.png",
-                        height: 30,
-                        width: 30,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                  ],
-                )
-              ],
-            ),
-          ),
-          const SizedBox(
-            height: 40,
-          ),
-          Container(
-            margin: const EdgeInsets.only(left: 10, right: 10),
-            padding: const EdgeInsets.all(8),
-            child: TextFormField(
-              controller: _goalName,
-              style: GoogleFonts.dmSans(color: colorwhite),
-              decoration: InputDecoration(
-                  enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  hintText: "Goal Name",
-                  hintStyle:
-                      GoogleFonts.dmSans(color: colorwhite, fontSize: 12)),
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.only(left: 10, right: 10),
-            padding: const EdgeInsets.all(8),
-            child: TextFormField(
-              controller: _goalAmount,
-              keyboardType: TextInputType.number,
-              style: GoogleFonts.dmSans(color: colorwhite),
-              decoration: InputDecoration(
-                  enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  hintText: "Amount",
-                  hintStyle:
-                      GoogleFonts.dmSans(color: colorwhite, fontSize: 12)),
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.only(left: 10, right: 10),
-            padding: const EdgeInsets.all(8),
-            child: TextFormField(
-              onTap: () {
-                _selectDate(); // Call Function that has showDatePicker()
-              },
-              controller: _goalDate,
-              style: GoogleFonts.dmSans(color: colorwhite),
-              decoration: InputDecoration(
-                  suffixIcon: Icon(
-                    Icons.calendar_today,
-                    color: colorwhite,
+              ),
+              Container(
+                margin: const EdgeInsets.only(left: 10, right: 10),
+                padding: const EdgeInsets.all(8),
+                child: TextFormField(
+                  controller: _goalName,
+                  style: GoogleFonts.dmSans(color: black),
+                  decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: borderColor)),
+                      errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: borderColor)),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: borderColor)),
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(color: borderColor)),
+                      hintText: "Goal Name",
+                      hintStyle:
+                          GoogleFonts.dmSans(color: black, fontSize: 12)),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0, left: 16),
+                child: Align(
+                  alignment: AlignmentDirectional.topStart,
+                  child: Text(
+                    'Amount',
+                    style: GoogleFonts.plusJakartaSans(
+                        color: black,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12),
                   ),
-                  enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  hintText: "Date",
-                  hintStyle:
-                      GoogleFonts.dmSans(color: colorwhite, fontSize: 12)),
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.only(left: 10, right: 10),
-            padding: const EdgeInsets.all(8),
-            child: TextFormField(
-              controller: _goalNote,
-              maxLines: 6,
-              style: GoogleFonts.dmSans(color: colorwhite),
-              decoration: InputDecoration(
-                  enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  hintText: "Notes",
-                  hintStyle:
-                      GoogleFonts.dmSans(color: colorwhite, fontSize: 12)),
-            ),
-          ),
-          isLoading
-              ? CircularProgressIndicator()
-              : InkWell(
-                  onTap: () async {
-                    if (_goalName.text.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text("Goal Name is Required is Required")));
-                    } else if (_goalDate.text.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Date is Required")));
-                    } else if (_goalAmount.text.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Amount is Required")));
-                    } else {
-                      setState(() {
-                        isLoading = true;
-                      });
-                    }
-
-                    String res = await Database().addGoal(
-                        name: _goalName.text.trim(),
-                        notes: _goalNote.text.trim() ?? "",
-                        amount: _goalAmount.text.trim(),
-                        date: _goalDate.text);
-
-                    setState(() {
-                      isLoading = false;
-                    });
-                    if (res != 'sucess') {
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(SnackBar(content: Text(res)));
-                    } else {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (builder) => FinancialGoals()));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Goals are added")));
-                    }
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(left: 10, right: 10),
+                padding: const EdgeInsets.all(8),
+                child: TextFormField(
+                  controller: _goalAmount,
+                  keyboardType: TextInputType.number,
+                  style: GoogleFonts.dmSans(color: black),
+                  decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: borderColor)),
+                      errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: borderColor)),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: borderColor)),
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(color: borderColor)),
+                      hintText: "Amount",
+                      hintStyle:
+                          GoogleFonts.dmSans(color: black, fontSize: 12)),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0, left: 16),
+                child: Align(
+                  alignment: AlignmentDirectional.topStart,
+                  child: Text(
+                    'Date',
+                    style: GoogleFonts.plusJakartaSans(
+                        color: black,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12),
+                  ),
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(left: 10, right: 10),
+                padding: const EdgeInsets.all(8),
+                child: TextFormField(
+                  onTap: () {
+                    _selectDate(); // Call Function that has showDatePicker()
                   },
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Image.asset("assets/btn.png"),
+                  controller: _goalDate,
+                  style: GoogleFonts.dmSans(color: black),
+                  decoration: InputDecoration(
+                      suffixIcon: Icon(
+                        Icons.calendar_today,
+                        color: black,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: borderColor)),
+                      errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: borderColor)),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: borderColor)),
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(color: borderColor)),
+                      hintText: "Date",
+                      hintStyle:
+                          GoogleFonts.dmSans(color: black, fontSize: 12)),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0, left: 16),
+                child: Align(
+                  alignment: AlignmentDirectional.topStart,
+                  child: Text(
+                    'Notes',
+                    style: GoogleFonts.plusJakartaSans(
+                        color: black,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12),
                   ),
-                )
-        ],
-      ),
-    ));
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(left: 10, right: 10),
+                padding: const EdgeInsets.all(8),
+                child: TextFormField(
+                  controller: _goalNote,
+                  maxLines: 6,
+                  style: GoogleFonts.dmSans(color: black),
+                  decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: borderColor)),
+                      errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: borderColor)),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: borderColor)),
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(color: borderColor)),
+                      hintText: "Notes",
+                      hintStyle:
+                          GoogleFonts.dmSans(color: black, fontSize: 12)),
+                ),
+              ),
+              isLoading
+                  ? CircularProgressIndicator()
+                  : SaveButton(
+                      onTap: () async {
+                        if (_goalName.text.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content:
+                                  Text("Goal Name is Required is Required")));
+                        } else if (_goalDate.text.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Date is Required")));
+                        } else if (_goalAmount.text.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Amount is Required")));
+                        } else {
+                          setState(() {
+                            isLoading = true;
+                          });
+                        }
+
+                        String res = await Database().addGoal(
+                            name: _goalName.text.trim(),
+                            notes: _goalNote.text.trim() ?? "",
+                            amount: _goalAmount.text.trim(),
+                            date: _goalDate.text);
+
+                        setState(() {
+                          isLoading = false;
+                        });
+                        if (res != 'sucess') {
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(SnackBar(content: Text(res)));
+                        } else {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (builder) => FinancialGoals()));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Goals are added")));
+                        }
+                      },
+                      title: "Add New Goals")
+            ],
+          ),
+        ));
   }
 
   //Functions

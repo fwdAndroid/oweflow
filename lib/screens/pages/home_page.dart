@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:oweflow/screens/accountpages/noti.dart';
+import 'package:oweflow/screens/accountpages/personalprofile.dart';
 import 'package:oweflow/screens/accountpages/premium_features.dart';
 import 'package:oweflow/utils/colors.dart';
 
@@ -10,10 +10,10 @@ class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => Debtors();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class Debtors extends State<HomePage> {
+class _HomePageState extends State<HomePage> {
   var totalAmount = 0;
 
   @override
@@ -26,212 +26,170 @@ class Debtors extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        decoration: BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage(
-                  "assets/back.png",
+      appBar: AppBar(
+        actions: [
+          IconButton(
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (builder) => PersonalProfile()));
+              },
+              icon: Icon(
+                Icons.settings,
+                color: black,
+              )),
+        ],
+        leading: IconButton(
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (builder) => PremiumFeatures()));
+            },
+            icon: Icon(
+              Icons.menu,
+              color: black,
+            )),
+        centerTitle: true,
+        title: Text(
+          "Home",
+          style: GoogleFonts.plusJakartaSans(
+              color: black, fontWeight: FontWeight.w500, fontSize: 16),
+        ),
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          //Debits Detals
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              width: 374,
+              height: 120,
+              decoration: ShapeDecoration(
+                color: buttonColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                fit: BoxFit.cover,
-                filterQuality: FilterQuality.high)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 30,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Current Balance',
+                      style: GoogleFonts.plusJakartaSans(
+                        color: colorwhite,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        height: 0,
+                        letterSpacing: -0.32,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    Text(
+                      '\$$totalAmount',
+                      style: GoogleFonts.inter(
+                        color: Colors.white,
+                        fontSize: 46,
+                        fontWeight: FontWeight.w400,
+                        height: 0,
+                        letterSpacing: -1.50,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                  ],
+                ),
+              ),
             ),
-            StreamBuilder<Object>(
-                stream: FirebaseFirestore.instance
-                    .collection("users")
-                    .doc(FirebaseAuth.instance.currentUser!.uid)
-                    .snapshots(),
-                builder: (context, AsyncSnapshot snapshot) {
-                  if (!snapshot.hasData) {
-                    return new CircularProgressIndicator();
-                  }
-                  var document = snapshot.data;
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          document['firstName'] + " " + document['lastName'],
-                          style: GoogleFonts.inter(
-                            color: colorwhite,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (builder) =>
-                                            PremiumFeatures()));
-                              },
-                              child: Image.asset(
-                                "assets/menu.png",
-                                height: 30,
-                                width: 30,
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (builder) => Noti()));
-                              },
-                              child: Image.asset("assets/noti.png",
-                                  height: 30, width: 30),
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                          ],
-                        )
-                      ],
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Transactions',
+              style: GoogleFonts.inter(
+                color: black,
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                height: 0,
+                letterSpacing: -0.40,
+              ),
+              textAlign: TextAlign.left,
+            ),
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height / 2.3,
+            child: StreamBuilder(
+              stream: getContactsStream(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                if (snapshot.data!.docs.isEmpty) {
+                  return Center(
+                    child: Text(
+                      "No Debtors Details Available",
+                      style: TextStyle(color: black),
                     ),
                   );
-                }),
-
-            //Debits Detals
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                width: 374,
-                height: 201,
-                decoration: ShapeDecoration(
-                  color: Color(0xFF141326),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Total Balance',
-                        style: GoogleFonts.inter(
-                          color: colorwhite,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          height: 0,
-                          letterSpacing: -0.32,
-                        ),
-                      ),
-                      Text(
-                        '\$$totalAmount',
-                        style: GoogleFonts.inter(
-                          color: Colors.white,
-                          fontSize: 30,
-                          fontWeight: FontWeight.w700,
-                          height: 0,
-                          letterSpacing: -1.50,
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Column(
-                        children: [
-                          Text(
-                            'Total Borrowers',
-                            style: GoogleFonts.inter(
-                              color: textColor,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              height: 0,
-                              letterSpacing: -0.32,
-                            ),
+                }
+                return ListView.builder(
+                  itemCount: snapshot.data!.docs.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final List<DocumentSnapshot> documents =
+                        snapshot.data!.docs;
+                    final Map<String, dynamic> data =
+                        documents[index].data() as Map<String, dynamic>;
+                    String contactNames = data['contact'].join(', ');
+                    return Card(
+                      elevation: 1,
+                      color: colorwhite,
+                      child: ListTile(
+                        title: Text(
+                          '$contactNames',
+                          style: GoogleFonts.plusJakartaSans(
+                            color: black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
                           ),
-                        ],
-                      ),
-                      FutureBuilder(
-                          future: docss(),
-                          builder: (context, snapshot) {
-                            return Text(
-                              snapshot.data.toString(),
-                              style: GoogleFonts.inter(
-                                color: Colors.white,
-                                fontSize: 30,
-                                fontWeight: FontWeight.w700,
-                                height: 0,
-                                letterSpacing: -1.50,
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              data['notes'],
+                              style: GoogleFonts.plusJakartaSans(
+                                color: black,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
                               ),
-                              textAlign: TextAlign.left,
-                            );
-                          }),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                'Debits',
-                style: GoogleFonts.inter(
-                  color: colorwhite,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  height: 0,
-                  letterSpacing: -0.40,
-                ),
-                textAlign: TextAlign.left,
-              ),
-            ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height / 2.3,
-              child: StreamBuilder(
-                stream: getContactsStream(),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-                  if (snapshot.data!.docs.isEmpty) {
-                    return const Center(
-                      child: Text(
-                        "No Debtors Details Available",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    );
-                  }
-                  return ListView.builder(
-                    itemCount: snapshot.data!.docs.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final List<DocumentSnapshot> documents =
-                          snapshot.data!.docs;
-                      final Map<String, dynamic> data =
-                          documents[index].data() as Map<String, dynamic>;
-                      String contactNames = data['contact'].join(', ');
-                      return Column(
-                        children: [
-                          ListTile(
-                            title: Text(
-                              'Name: $contactNames',
-                              style: TextStyle(color: Colors.white),
                             ),
-                            subtitle: Text(
-                              'Amount: ${data['amount'].toString()}' + "\$",
-                              style: TextStyle(color: Colors.white),
+                            Text(
+                              data['date'],
+                              style: GoogleFonts.plusJakartaSans(
+                                color: black,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                              ),
                             ),
-                            // Add more fields as needed
-                            trailing: TextButton(
+                          ],
+                        ),
+                        // Add more fields as needed
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "\$" + data['amount'].toString(),
+                              style: GoogleFonts.plusJakartaSans(
+                                color: black,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            IconButton(
                                 onPressed: () {
                                   showDialog<void>(
                                     context: context,
@@ -244,19 +202,16 @@ class Debtors extends State<HomePage> {
                                           child: ListTile(
                                             title: Text(
                                               contactNames.toString(),
-                                              style:
-                                                  TextStyle(color: borderColor),
+                                              style: TextStyle(color: black),
                                             ),
                                             subtitle: Text(
                                               data['date'],
-                                              style:
-                                                  TextStyle(color: borderColor),
+                                              style: TextStyle(color: black),
                                             ),
                                             trailing: Text(
                                               '${data['amount'].toString()}' +
                                                   "\$",
-                                              style:
-                                                  TextStyle(color: borderColor),
+                                              style: TextStyle(color: black),
                                             ),
                                           ),
                                         ),
@@ -299,21 +254,20 @@ class Debtors extends State<HomePage> {
                                     },
                                   );
                                 },
-                                child: Text(
-                                  "Mark as Complete",
-                                  style: TextStyle(color: g),
+                                icon: Icon(
+                                  Icons.check,
+                                  color: g,
                                 )),
-                          ),
-                          Divider()
-                        ],
-                      );
-                    },
-                  );
-                },
-              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -363,3 +317,20 @@ class Debtors extends State<HomePage> {
     }
   }
 }
+
+
+//Total Borrows
+// Column(
+//                       children: [
+//                         Text(
+//                           'Total Borrowers',
+//                           style: GoogleFonts.inter(
+//                             color: textColor,
+//                             fontSize: 16,
+//                             fontWeight: FontWeight.w600,
+//                             height: 0,
+//                             letterSpacing: -0.32,
+//                           ),
+//                         ),
+//                       ],
+//                     ),

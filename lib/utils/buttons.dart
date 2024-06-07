@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:oweflow/utils/colors.dart';
 
 // ignore: must_be_immutable
@@ -10,31 +11,21 @@ class SaveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(colors: [
-            Color(0xffE3823C),
-            Color(0xffE33C3C),
-            //add more colors
-          ]),
-          borderRadius: BorderRadius.circular(10),
+    return Center(
+      child: ElevatedButton(
+        onPressed: onTap,
+        style: ElevatedButton.styleFrom(
+            fixedSize: Size(270, 49),
+            backgroundColor: buttonColor,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12))),
+        child: Text(
+          title,
+          style: GoogleFonts.plusJakartaSans(
+              color: colorwhite, fontWeight: FontWeight.w600, fontSize: 16),
         ),
-        child: ElevatedButton(
-          onPressed: onTap,
-          style: ElevatedButton.styleFrom(
-              fixedSize: Size(270, 49),
-              backgroundColor: Colors.transparent,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12))),
-          child: Text(
-            title,
-            style: TextStyle(
-                fontSize: 14,
-                fontFamily: "Mulish",
-                fontWeight: FontWeight.w500,
-                color: colorwhite),
-          ),
-        ));
+      ),
+    );
   }
 }
 

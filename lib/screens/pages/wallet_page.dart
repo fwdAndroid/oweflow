@@ -1,6 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:oweflow/screens/accountpages/noti.dart';
 import 'package:oweflow/screens/accountpages/premium_features.dart';
 import 'package:oweflow/utils/colors.dart';
 
@@ -12,175 +13,258 @@ class WalletPage extends StatefulWidget {
 }
 
 class _WalletPageState extends State<WalletPage> {
+  var totalAmount = 0;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    calculateTotalAmount();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        decoration: BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage(
-                  "assets/back.png",
+      appBar: AppBar(
+        actions: [
+          IconButton(
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (builder) => PremiumFeatures()));
+              },
+              icon: Icon(
+                Icons.menu,
+                color: black,
+              )),
+        ],
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(Icons.arrow_back)),
+        centerTitle: true,
+        title: Text(
+          "Transaction Details",
+          style: GoogleFonts.plusJakartaSans(
+              color: black, fontWeight: FontWeight.w500, fontSize: 16),
+        ),
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              width: 374,
+              height: 120,
+              decoration: ShapeDecoration(
+                color: buttonColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                fit: BoxFit.cover,
-                filterQuality: FilterQuality.high)),
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 40,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Transaction Details',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                      color: colorwhite,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      height: 0,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Current Balance',
+                      style: GoogleFonts.plusJakartaSans(
+                        color: colorwhite,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        height: 0,
+                        letterSpacing: -0.32,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                  ),
-                  Row(
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (builder) => Noti()));
-                        },
-                        child: Image.asset(
-                          "assets/noti.png",
-                          height: 30,
-                          width: 30,
-                        ),
+                    Text(
+                      '\$$totalAmount',
+                      style: GoogleFonts.inter(
+                        color: colorwhite,
+                        fontSize: 46,
+                        fontWeight: FontWeight.w400,
+                        height: 0,
+                        letterSpacing: -1.50,
                       ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (builder) => PremiumFeatures()));
-                        },
-                        child: Image.asset(
-                          "assets/menu.png",
-                          height: 30,
-                          width: 30,
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                    ],
-                  )
-                ],
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(
-              height: 20,
+          ),
+          const SizedBox(
+            height: 30,
+          ),
+          Text(
+            "Current Transactions",
+            style: GoogleFonts.inter(
+              color: colorwhite,
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              height: 0,
             ),
-            Text(
-              'Total Balance',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                color: colorwhite,
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                height: 0,
-              ),
-            ),
-            Text(
-              '\$ 2,548.00',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                color: colorwhite,
-                fontSize: 30,
-                fontWeight: FontWeight.w700,
-                height: 0,
-                letterSpacing: -1.50,
-              ),
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
-                      onPressed: () {},
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height / 4,
+              child: StreamBuilder(
+                stream: getContactsStream(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                  if (snapshot.data!.docs.isEmpty) {
+                    return Center(
                       child: Text(
-                        "Transaction Detail",
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.inter(
-                            color: c,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600),
-                      )),
-                  Image.asset(
-                    "assets/calendar.png",
-                    height: 35,
-                  )
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height / 1.9,
-                child: ListView.builder(
-                    itemCount: 15,
+                        "No Debtors Details Available",
+                        style: TextStyle(color: black),
+                      ),
+                    );
+                  }
+                  return ListView.builder(
+                    itemCount: snapshot.data!.docs.length,
                     itemBuilder: (BuildContext context, int index) {
+                      final List<DocumentSnapshot> documents =
+                          snapshot.data!.docs;
+                      final Map<String, dynamic> data =
+                          documents[index].data() as Map<String, dynamic>;
+                      String contactNames = data['contact'].join(', ');
                       return Column(
                         children: [
                           ListTile(
-                            leading: CircleAvatar(
-                              backgroundImage: AssetImage("assets/splash.png"),
-                            ),
-                            trailing: Text(
-                              '500\$',
-                              style: GoogleFonts.lato(
-                                color: colorwhite,
-                                fontSize: 24,
-                                fontWeight: FontWeight.w400,
-                                height: 0,
+                              title: Text(
+                                'Name: $contactNames',
+                                style: TextStyle(color: black),
                               ),
-                            ),
-                            title: Text(
-                              'Subodh Kolhe',
-                              style: GoogleFonts.lato(
-                                color: colorwhite,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w400,
-                                height: 0,
+                              subtitle: Text(
+                                'Amount: ${data['amount'].toString()}' + "\$",
+                                style: TextStyle(color: black),
                               ),
-                            ),
-                            subtitle: Text(
-                              'You owe',
-                              style: GoogleFonts.lato(
-                                color: colorwhite,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                                height: 0,
-                              ),
-                            ),
-                          ),
+                              // Add more fields as needed
+                              trailing: Text(
+                                data['status'],
+                                style: TextStyle(color: g),
+                              )),
                           Divider()
                         ],
                       );
-                    }),
+                    },
+                  );
+                },
               ),
             ),
-          ],
-        ),
+          ),
+          //Closed
+          Text(
+            "Closed Transactions",
+            style: GoogleFonts.inter(
+              color: colorwhite,
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              height: 0,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height / 4,
+              child: StreamBuilder(
+                stream: getContactsStreamD(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                  if (snapshot.data!.docs.isEmpty) {
+                    return Center(
+                      child: Text(
+                        "No Debtors Details Available",
+                        style: TextStyle(color: black),
+                      ),
+                    );
+                  }
+                  return ListView.builder(
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final List<DocumentSnapshot> documents =
+                          snapshot.data!.docs;
+                      final Map<String, dynamic> data =
+                          documents[index].data() as Map<String, dynamic>;
+
+                      return Column(
+                        children: [
+                          ListTile(
+                              title: Text(
+                                'Name: ${data['contact'].toString()}',
+                                style: TextStyle(color: black),
+                              ),
+                              subtitle: Text(
+                                'Amount: ${data['date'].toString()}',
+                                style: TextStyle(color: black),
+                              ),
+                              // Add more fields as needed
+                              trailing: Text(
+                                data['status'],
+                                style: TextStyle(color: g),
+                              )),
+                          Divider()
+                        ],
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+//Functions
+  Future<void> calculateTotalAmount() async {
+    // Query Firestore to calculate total amount
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('debitTransaction') // Replace with your collection name
+          .where('userID', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+          .get();
+
+      double total = 0.0;
+
+      querySnapshot.docs.forEach((doc) {
+        total +=
+            (doc['amount'] ?? 0.0); // Replace 'amount' with your field name
+      });
+
+      setState(() {
+        totalAmount = total.toInt();
+      });
+    } catch (e) {
+      print('Error calculating total amount: $e');
+    }
+  }
+
+  Stream<QuerySnapshot> getContactsStream() {
+    return FirebaseFirestore.instance
+        .collection("debitTransaction")
+        .where("userID", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .snapshots();
+  }
+
+  Stream<QuerySnapshot> getContactsStreamD() {
+    return FirebaseFirestore.instance
+        .collection("closedTransaction")
+        .where("userID", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .snapshots();
   }
 }

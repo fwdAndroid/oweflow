@@ -35,46 +35,25 @@ class _StatsPageState extends State<StatsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: InkWell(
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (builder) => PremiumFeatures()));
-              },
-              child: Image.asset(
-                "assets/menu.png",
-                height: 30,
-                width: 30,
-              ),
-            ),
-          ),
-        ],
+        leading: IconButton(
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (builder) => PremiumFeatures()));
+            },
+            icon: Icon(
+              Icons.menu,
+              color: black,
+            )),
         centerTitle: true,
-        automaticallyImplyLeading: false,
         title: Text(
-          'Statistics',
-          textAlign: TextAlign.center,
-          style: GoogleFonts.inter(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            height: 0,
-          ),
+          "Statistics",
+          style: GoogleFonts.plusJakartaSans(
+              color: black, fontWeight: FontWeight.w500, fontSize: 16),
         ),
-        elevation: 0,
-        backgroundColor: appBarColor,
       ),
       body: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        decoration: BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage(
-                  "assets/splash.png",
-                ),
-                fit: BoxFit.cover)),
         child: Column(
           children: [
             const SizedBox(
@@ -88,7 +67,7 @@ class _StatsPageState extends State<StatsPage> {
                   Text(
                     'Top Spending',
                     style: GoogleFonts.inter(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                     ),

@@ -14,24 +14,16 @@ class _NotiState extends State<Noti> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: appBarColor,
-          iconTheme: IconThemeData(color: colorwhite),
+          iconTheme: IconThemeData(color: black),
           centerTitle: true,
           title: Text(
             "Notifications",
-            style: TextStyle(color: colorwhite),
+            style: TextStyle(color: black),
           ),
         ),
         body: Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
-          decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage(
-                    "assets/splash.png",
-                  ),
-                  filterQuality: FilterQuality.high,
-                  fit: BoxFit.cover)),
           child:
               ListView.builder(itemBuilder: (BuildContext context, int index) {
             return Column(
@@ -43,7 +35,7 @@ class _NotiState extends State<Noti> {
                   title: Text(
                     'Contact Added',
                     style: GoogleFonts.workSans(
-                      color: colorwhite,
+                      color: black,
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
                       height: 0,
@@ -52,7 +44,7 @@ class _NotiState extends State<Noti> {
                   subtitle: Text(
                     'Contact Added',
                     style: GoogleFonts.workSans(
-                      color: colorwhite,
+                      color: black,
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
                       height: 0,

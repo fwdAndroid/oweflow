@@ -19,208 +19,214 @@ class _PremiumFeaturesState extends State<PremiumFeatures> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Container(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height,
-      decoration: BoxDecoration(
-          image: DecorationImage(
-              image: AssetImage(
-                "assets/back.png",
-              ),
-              fit: BoxFit.cover,
-              filterQuality: FilterQuality.high)),
-      child: Column(
-        children: [
-          const SizedBox(
-            height: 40,
+        appBar: AppBar(
+          actions: [
+            IconButton(
+                onPressed: () {
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (builder) => Noti()));
+                },
+                icon: Icon(
+                  Icons.notifications,
+                  color: black,
+                )),
+          ],
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: Icon(
+                Icons.arrow_back,
+                color: black,
+              )),
+          centerTitle: true,
+          title: Text(
+            "Premium Features",
+            style: GoogleFonts.plusJakartaSans(
+                color: black, fontWeight: FontWeight.w500, fontSize: 16),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: Icon(
-                      Icons.arrow_back_ios,
-                      color: colorwhite,
-                    )),
-                Text(
-                  'Premium Features',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    color: colorwhite,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
+        ),
+        body: Column(
+          children: [
+            const SizedBox(
+              height: 40,
+            ),
+            StreamBuilder<Object>(
+                stream: FirebaseFirestore.instance
+                    .collection("users")
+                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                    .snapshots(),
+                builder: (context, AsyncSnapshot snapshot) {
+                  if (!snapshot.hasData) {
+                    return new CircularProgressIndicator();
+                  }
+                  var document = snapshot.data;
+                  return Card(
+                    child: Container(
+                      height: 70,
+                      width: MediaQuery.of(context).size.width,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              document['firstName'],
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                color: black,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                height: 0,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+            const SizedBox(
+              height: 30,
+            ),
+            Card(
+              color: Colors.white,
+              child: ListTile(
+                trailing: Icon(
+                  Icons.arrow_forward,
+                  color: arrowColor,
+                ),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (builder) => FinancialGoals()));
+                },
+                leading: Image.asset(
+                  "assets/mdi_finance.png",
+                  width: 35,
+                  height: 30,
+                ),
+                title: Text(
+                  'Financial Goals',
+                  style: GoogleFonts.plusJakartaSans(
+                    color: black,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
                     height: 0,
                   ),
                 ),
-                Row(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (builder) => Noti()));
-                      },
-                      child: Image.asset(
-                        "assets/noti.png",
-                        height: 30,
-                        width: 30,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (builder) => PremiumFeatures()));
-                      },
-                      child: Image.asset(
-                        "assets/menu.png",
-                        height: 30,
-                        width: 30,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                  ],
-                )
-              ],
+              ),
             ),
-          ),
-          const SizedBox(
-            height: 40,
-          ),
-          StreamBuilder<Object>(
-              stream: FirebaseFirestore.instance
-                  .collection("users")
-                  .doc(FirebaseAuth.instance.currentUser!.uid)
-                  .snapshots(),
-              builder: (context, AsyncSnapshot snapshot) {
-                if (!snapshot.hasData) {
-                  return new CircularProgressIndicator();
-                }
-                var document = snapshot.data;
-                return Text(
-                  document['firstName'] + " " + document['lastName'],
-                  style: GoogleFonts.inter(
-                    color: colorwhite,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
+            Card(
+              color: Colors.white,
+              child: ListTile(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (builder) => BudgetTracking()));
+                },
+                leading: Image.asset(
+                  "assets/fluent_eye-tracking-20-filled.png",
+                  width: 35,
+                  height: 30,
+                ),
+                trailing: Icon(
+                  Icons.arrow_forward,
+                  color: arrowColor,
+                ),
+                title: Text(
+                  'Budget  Tracking',
+                  style: GoogleFonts.plusJakartaSans(
+                    color: black,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    height: 0,
                   ),
-                );
-              }),
-          const SizedBox(
-            height: 30,
-          ),
-          ListTile(
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (builder) => FinancialGoals()));
-            },
-            leading: Image.asset(
-              "assets/mdi_finance.png",
-              width: 35,
-              height: 30,
-            ),
-            title: Text(
-              'Financial Goals',
-              style: GoogleFonts.inter(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                height: 0,
+                ),
               ),
             ),
-          ),
-          ListTile(
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (builder) => BudgetTracking()));
-            },
-            leading: Image.asset(
-              "assets/fluent_eye-tracking-20-filled.png",
-              width: 35,
-              height: 30,
-            ),
-            title: Text(
-              'Budget  Tracking',
-              style: GoogleFonts.inter(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                height: 0,
+            Card(
+              color: Colors.white,
+              child: ListTile(
+                trailing: Icon(
+                  Icons.arrow_forward,
+                  color: arrowColor,
+                ),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (builder) => CurrencyExchange()));
+                },
+                leading: Image.asset(
+                  "assets/mdi_dollar.png",
+                  width: 35,
+                  height: 30,
+                ),
+                title: Text(
+                  'Currency Exchange',
+                  style: GoogleFonts.plusJakartaSans(
+                    color: black,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    height: 0,
+                  ),
+                ),
               ),
             ),
-          ),
-          ListTile(
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (builder) => CurrencyExchange()));
-            },
-            leading: Image.asset(
-              "assets/mdi_dollar.png",
-              width: 35,
-              height: 30,
-            ),
-            title: Text(
-              'Currency Exchange',
-              style: GoogleFonts.inter(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                height: 0,
-              ),
-            ),
-          ),
-          ListTile(
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (builder) => CurrencyExchange()));
-            },
-            leading: Image.asset(
-              "assets/shield-checkered-fill 1.png",
-              width: 35,
-              height: 30,
-            ),
-            title: Text(
-              'Reports',
-              style: GoogleFonts.inter(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                height: 0,
-              ),
-            ),
-          ),
-          ListTile(
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (builder) => PremiumFeatures()));
-            },
-            leading: Image.asset(
-              "assets/lock-key-fill 1.png",
-              width: 35,
-              height: 30,
-            ),
-            title: Text(
-              'Mode Customization',
-              style: GoogleFonts.inter(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                height: 0,
-              ),
-            ),
-          ),
-        ],
-      ),
-    ));
+            // ListTile(
+            //   onTap: () {
+            //     Navigator.push(
+            //         context,
+            //         MaterialPageRoute(
+            //             builder: (builder) => CurrencyExchange()));
+            //   },
+            //   leading: Image.asset(
+            //     "assets/shield-checkered-fill 1.png",
+            //     width: 35,
+            //     height: 30,
+            //   ),
+            //   title: Text(
+            //     'Reports',
+            //     style: GoogleFonts.inter(
+            //       color: Colors.white,
+            //       fontSize: 16,
+            //       fontWeight: FontWeight.w500,
+            //       height: 0,
+            //     ),
+            //   ),
+            // ),
+            // Card(
+            //   child: ListTile(
+            //     trailing: Icon(
+            //       Icons.arrow_forward,
+            //       color: arrowColor,
+            //     ),
+            //     onTap: () {
+            //       Navigator.push(
+            //           context,
+            //           MaterialPageRoute(
+            //               builder: (builder) => PremiumFeatures()));
+            //     },
+            //     leading: Image.asset(
+            //       "assets/lock-key-fill 1.png",
+            //       width: 35,
+            //       height: 30,
+            //     ),
+            //     title: Text(
+            //       'Mode Customization',
+            //       style: GoogleFonts.plusJakartaSans(
+            //         color: black,
+            //         fontSize: 12,
+            //         fontWeight: FontWeight.w500,
+            //         height: 0,
+            //       ),
+            //     ),
+            //   ),
+            // ),
+          ],
+        ));
   }
 }

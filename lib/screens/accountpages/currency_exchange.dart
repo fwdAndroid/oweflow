@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:oweflow/screens/accountpages/noti.dart';
+import 'package:oweflow/utils/buttons.dart';
 import 'package:oweflow/utils/colors.dart';
 
 class CurrencyExchange extends StatefulWidget {
@@ -49,176 +50,150 @@ class _CurrencyExchangeState extends State<CurrencyExchange> {
 
   @override
   Widget build(BuildContext context) {
+    TextEditingController _amountController = TextEditingController();
     return Scaffold(
-      body: Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        decoration: BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage(
-                  "assets/back.png",
-                ),
-                fit: BoxFit.cover,
-                filterQuality: FilterQuality.high)),
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 40,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: Icon(
-                        Icons.arrow_back_ios,
-                        color: colorwhite,
-                      )),
-                  Text(
-                    'Change Currency',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                      color: colorwhite,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      height: 0,
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (builder) => Noti()));
-                    },
-                    child: Image.asset(
-                      "assets/noti.png",
-                      height: 30,
-                      width: 30,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 40,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Align(
-                alignment: AlignmentDirectional.topStart,
-                child: Text(
-                  'Enter Amount',
-                  style: GoogleFonts.dmSans(
-                    color: colorwhite,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    height: 0.14,
-                    letterSpacing: 0.42,
-                  ),
+      appBar: AppBar(
+        actions: [
+          IconButton(
+              onPressed: () {
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (builder) => Noti()));
+              },
+              icon: Icon(Icons.notifications))
+        ],
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(
+              Icons.arrow_back,
+              color: black,
+            )),
+        centerTitle: true,
+        title: Text(
+          "Change Currency",
+          style: GoogleFonts.plusJakartaSans(
+              color: black, fontWeight: FontWeight.w500, fontSize: 16),
+        ),
+      ),
+      body: Column(
+        children: [
+          const SizedBox(
+            height: 40,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Align(
+              alignment: AlignmentDirectional.topStart,
+              child: Text(
+                'Enter Amount',
+                style: GoogleFonts.dmSans(
+                  color: black,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  height: 0.14,
+                  letterSpacing: 0.42,
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                style: TextStyle(color: colorwhite),
-                decoration: InputDecoration(
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: borderColor)),
-                    errorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: borderColor)),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: borderColor)),
-                    border: OutlineInputBorder(
-                        borderSide: BorderSide(color: borderColor)),
-                    hintText: "Enter Amount",
-                    hintStyle:
-                        GoogleFonts.dmSans(color: colorwhite, fontSize: 12)),
-                keyboardType: TextInputType.number,
-                onChanged: (value) {
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _amountController,
+              style: TextStyle(color: black),
+              decoration: InputDecoration(
+                  enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: borderColor)),
+                  errorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: borderColor)),
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: borderColor)),
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide(color: borderColor)),
+                  hintText: "Enter Amount",
+                  hintStyle: GoogleFonts.dmSans(color: black, fontSize: 12)),
+              keyboardType: TextInputType.number,
+            ),
+          ),
+          SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Text(
+                'From:',
+                style: TextStyle(color: black),
+              ),
+              DropdownButton<String>(
+                value: baseCurrency,
+                onChanged: (String? newValue) {
                   setState(() {
-                    amount = double.tryParse(value) ?? 0.0;
+                    baseCurrency = newValue!;
+                    fetchExchangeRate();
                   });
                 },
+                items: <String>['USD', 'EUR', 'GBP', 'JPY', 'CAD']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(
+                      value,
+                      style: TextStyle(color: black),
+                    ),
+                  );
+                }).toList(),
               ),
-            ),
-            SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(
-                  'From:',
-                  style: TextStyle(color: colorwhite),
-                ),
-                DropdownButton<String>(
-                  value: baseCurrency,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      baseCurrency = newValue!;
-                      fetchExchangeRate();
-                    });
-                  },
-                  items: <String>['USD', 'EUR', 'GBP', 'JPY', 'CAD']
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(
-                        value,
-                        style: TextStyle(color: black),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(
-                  'To:',
-                  style: TextStyle(color: colorwhite),
-                ),
-                DropdownButton<String>(
-                  style: TextStyle(
-                      color: Colors.black), // Set the global text color
-                  value: targetCurrency,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      targetCurrency = newValue!;
-                      fetchExchangeRate();
-                    });
-                  },
-                  items: <String>['USD', 'EUR', 'GBP', 'JPY', 'CAD']
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(
-                        value,
-                        style: TextStyle(
-                            color: Colors
-                                .black), // Set the dropdown item text color
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Exchange Rate: 1 $baseCurrency = $exchangeRate $targetCurrency',
-              style: TextStyle(color: colorwhite),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Converted Amount: ${amount * exchangeRate} $targetCurrency',
-              style: TextStyle(color: colorwhite),
-            ),
-          ],
-        ),
+            ],
+          ),
+          SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Text(
+                'To:',
+                style: TextStyle(color: black),
+              ),
+              DropdownButton<String>(
+                style:
+                    TextStyle(color: Colors.black), // Set the global text color
+                value: targetCurrency,
+                onChanged: (String? newValue) {
+                  setState(() {
+                    targetCurrency = newValue!;
+                    fetchExchangeRate();
+                  });
+                },
+                items: <String>['USD', 'EUR', 'GBP', 'JPY', 'CAD']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(
+                      value,
+                      style: TextStyle(
+                          color:
+                              Colors.black), // Set the dropdown item text color
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
+          SizedBox(height: 20),
+          Text(
+            'Exchange Rate: 1 $baseCurrency = $exchangeRate $targetCurrency',
+            style: TextStyle(color: black),
+          ),
+          SizedBox(height: 20),
+          Text(
+            'Converted Amount: ${amount * exchangeRate} $targetCurrency',
+            style: TextStyle(color: black),
+          ),
+          SaveButton(
+              title: "Convert",
+              onTap: () {
+                amount = double.tryParse(_amountController.text) ?? 0.0;
+              })
+        ],
       ),
     );
   }

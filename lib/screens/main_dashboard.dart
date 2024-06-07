@@ -26,7 +26,7 @@ class _MainDashboardState extends State<MainDashboard> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        backgroundColor: textColor,
+        backgroundColor: buttonColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
         onPressed: () {
           Navigator.push(context,
@@ -42,7 +42,7 @@ class _MainDashboardState extends State<MainDashboard> {
       bottomNavigationBar: Container(
         child: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
-          backgroundColor: Color(0xff5d3237),
+          backgroundColor: colorwhite,
           currentIndex: _currentIndex,
           elevation: 0,
           onTap: (index) {
@@ -52,37 +52,46 @@ class _MainDashboardState extends State<MainDashboard> {
           },
           items: [
             BottomNavigationBarItem(
-              icon: Image.asset(
-                _currentIndex == 0 ? 'assets/homecolor.png' : 'assets/home.png',
-                height: 33,
-              ),
+              icon: _currentIndex == 0
+                  ? Image.asset(
+                      "assets/home.png",
+                      height: 24,
+                    )
+                  : Icon(
+                      Icons.home_filled,
+                      size: 24,
+                      color: Color(0xffDBE0E0),
+                    ),
               label: '',
             ),
             BottomNavigationBarItem(
               icon: Image.asset(
                 _currentIndex == 1
-                    ? 'assets/statscolor.png'
-                    : 'assets/stats.png',
-                height: 33,
+                    ? 'assets/walletcolor.png'
+                    : 'assets/wallet.png',
+                height: 24,
               ),
               label: '',
             ),
             BottomNavigationBarItem(
               label: "",
               icon: Image.asset(
-                _currentIndex == 2
-                    ? 'assets/walletcolor.png'
-                    : 'assets/wallet.png',
-                height: 33,
+                _currentIndex == 2 ? 'assets/vs.png' : 'assets/wave.png',
+                height: 24,
               ),
             ),
             BottomNavigationBarItem(
-              label: "",
-              icon: Image.asset(
-                _currentIndex == 3 ? 'assets/usercolor.png' : 'assets/user.png',
-                height: 33,
-              ),
-            ),
+                label: "",
+                icon: _currentIndex == 3
+                    ? Icon(
+                        Icons.person,
+                        size: 24,
+                        color: Color(0xff7C5CFC),
+                      )
+                    : Image.asset(
+                        'assets/p.png',
+                        height: 24,
+                      )),
           ],
           // Set the color for unselected items
         ),
