@@ -20,7 +20,10 @@ class DatabaseMethod {
           "CREATE TABLE IF NOT EXISTS contacts(id INTEGER PRIMARY KEY, name TEXT, email TEXT, phonenumber TEXT)",
         );
         await db.execute(
-          "CREATE TABLE IF NOT EXISTS transactionsform(id INTEGER PRIMARY KEY, amount INTEGER, notes TEXT, date TEXT,contact_id INTEGER, contact_name TEXT,FOREIGN KEY(contact_id) REFERENCES contacts(id))",
+          "CREATE TABLE IF NOT EXISTS transactionsform(id INTEGER PRIMARY KEY, amount INTEGER, notes TEXT, date TEXT, contact_id INTEGER, contact_name TEXT, FOREIGN KEY(contact_id) REFERENCES contacts(id))",
+        );
+        await db.execute(
+          "CREATE TABLE IF NOT EXISTS completedtransactions(id INTEGER PRIMARY KEY, amount INTEGER, notes TEXT, date TEXT, contact_id INTEGER, contact_name TEXT, FOREIGN KEY(contact_id) REFERENCES contacts(id))",
         );
       },
       onUpgrade: (db, oldVersion, newVersion) async {
@@ -45,6 +48,37 @@ class DatabaseMethod {
       event,
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+  }
+
+  Future<List<Map<String, dynamic>>> getAllTransactions() async {
+    final db = await database;
+    return await db.query('transactionsform');
+  }
+
+  Future<void> deleteTransaction(int id) async {
+    final db = await database;
+    await db.delete(
+      'transactionsform',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<void> insertCompletedTransaction(
+      Map<String, dynamic> transaction) async {
+    final db = await database;
+    await db.insert(
+      'completedtransactions',
+      transaction,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<int> calculateTotalAmount() async {
+    final db = await database;
+    final result =
+        await db.rawQuery('SELECT SUM(amount) as total FROM transactionsform');
+    return result.first['total'] != null ? result.first['total'] as int : 0;
   }
 
   Future<List<Map<String, dynamic>>> getAllContacts() async {

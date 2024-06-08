@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:oweflow/localdatabase/local_db.dart';
 import 'package:oweflow/offline_mode/featuers/offline_pre_features.dart';
-
 import 'package:oweflow/utils/colors.dart';
 
 class OfflineHomePage extends StatefulWidget {
@@ -13,12 +13,50 @@ class OfflineHomePage extends StatefulWidget {
 
 class _OfflineHomePageState extends State<OfflineHomePage> {
   var totalAmount = 0;
+  List<Map<String, dynamic>> transactions = [];
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    // calculateTotalAmount();
+    calculateTotalAmount();
+    fetchTransactions();
+  }
+
+  Future<void> calculateTotalAmount() async {
+    try {
+      DatabaseMethod dbMethod = DatabaseMethod();
+      int amount = await dbMethod.calculateTotalAmount();
+      setState(() {
+        totalAmount = amount;
+      });
+    } catch (e) {
+      print('Error calculating total amount: $e');
+    }
+  }
+
+  Future<void> fetchTransactions() async {
+    try {
+      DatabaseMethod dbMethod = DatabaseMethod();
+      List<Map<String, dynamic>> fetchedTransactions =
+          await dbMethod.getAllTransactions();
+      setState(() {
+        transactions = fetchedTransactions;
+      });
+    } catch (e) {
+      print('Error fetching transactions: $e');
+    }
+  }
+
+  Future<void> completeTransaction(Map<String, dynamic> transaction) async {
+    try {
+      DatabaseMethod dbMethod = DatabaseMethod();
+      await dbMethod.insertCompletedTransaction(transaction);
+      await dbMethod.deleteTransaction(transaction['id']);
+      fetchTransactions();
+      calculateTotalAmount();
+    } catch (e) {
+      print('Error completing transaction: $e');
+    }
   }
 
   @override
@@ -44,7 +82,7 @@ class _OfflineHomePageState extends State<OfflineHomePage> {
           ),
         ),
         body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          //Debits Detals
+          // Debits Details
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
@@ -108,14 +146,15 @@ class _OfflineHomePageState extends State<OfflineHomePage> {
           SizedBox(
               height: MediaQuery.of(context).size.height / 2.3,
               child: ListView.builder(
+                itemCount: transactions.length,
                 itemBuilder: (BuildContext context, int index) {
-                  //String contactNames = data['contact'].join(', ');
+                  final transaction = transactions[index];
                   return Card(
                     elevation: 1,
                     color: colorwhite,
                     child: ListTile(
                       title: Text(
-                        'Total Contact Names',
+                        transaction['contact_name'],
                         style: GoogleFonts.plusJakartaSans(
                           color: black,
                           fontSize: 14,
@@ -126,7 +165,7 @@ class _OfflineHomePageState extends State<OfflineHomePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "data['notes']",
+                            transaction['notes'],
                             style: GoogleFonts.plusJakartaSans(
                               color: black,
                               fontSize: 12,
@@ -134,7 +173,7 @@ class _OfflineHomePageState extends State<OfflineHomePage> {
                             ),
                           ),
                           Text(
-                            "data['date']",
+                            transaction['date'],
                             style: GoogleFonts.plusJakartaSans(
                               color: black,
                               fontSize: 12,
@@ -143,12 +182,11 @@ class _OfflineHomePageState extends State<OfflineHomePage> {
                           ),
                         ],
                       ),
-                      // Add more fields as needed
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            "Amount",
+                            '\$${transaction['amount']}',
                             style: GoogleFonts.plusJakartaSans(
                               color: black,
                               fontSize: 12,
@@ -156,68 +194,8 @@ class _OfflineHomePageState extends State<OfflineHomePage> {
                             ),
                           ),
                           IconButton(
-                              onPressed: () {
-                                showDialog<void>(
-                                  context: context,
-                                  barrierDismissible:
-                                      false, // user must tap button!
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: const Text('Debt Information'),
-                                      content: SingleChildScrollView(
-                                        child: ListTile(
-                                          title: Text(
-                                            "contactNames.toString()",
-                                            style: TextStyle(color: black),
-                                          ),
-                                          subtitle: Text(
-                                            " data['date']",
-                                            style: TextStyle(color: black),
-                                          ),
-                                          trailing: Text(
-                                            "Total AMount",
-                                            style: TextStyle(color: black),
-                                          ),
-                                        ),
-                                      ),
-                                      actions: <Widget>[
-                                        TextButton(
-                                          child: const Text('Done'),
-                                          onPressed: () async {
-                                            print("object");
-                                            // await FirebaseFirestore.instance
-                                            //     .collection(
-                                            //         "closedTransaction")
-                                            //     .doc(data['uuid'])
-                                            //     .set(
-                                            //   {
-                                            //     "status": "closed",
-                                            //     "amount": 0,
-                                            //     "notes": data['notes'],
-                                            //     "userID": data['userID'],
-                                            //     "uuid": data['uuid'],
-                                            //     "contact": contactNames,
-                                            //     "date": data['date']
-                                            //   },
-                                            // );
-                                            // await FirebaseFirestore.instance
-                                            //     .collection(
-                                            //         "debitTransaction")
-                                            //     .doc(data['uuid'])
-                                            //     .delete();
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                        TextButton(
-                                          child: const Text('close'),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
+                              onPressed: () async {
+                                await completeTransaction(transaction);
                               },
                               icon: Icon(
                                 Icons.check,
@@ -232,66 +210,3 @@ class _OfflineHomePageState extends State<OfflineHomePage> {
         ]));
   }
 }
-
-// //Functions
-//   //Contact List
-//   Stream<QuerySnapshot> getContactsStream() {
-//     return FirebaseFirestore.instance
-//         .collection("debitTransaction")
-//         .where("userID", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-//         .snapshots();
-//   }
-
-//   //Number of Debitors
-//   docss() async {
-//     AggregateQuerySnapshot query = await FirebaseFirestore.instance
-//         .collection('debitTransaction')
-//         .where("userID", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-//         .count()
-//         .get();
-
-//     int numberOfDocuments = query.count;
-//     return numberOfDocuments;
-//   }
-
-//   //Total Amount
-//   Future<void> calculateTotalAmount() async {
-//     // Query Firestore to calculate total amount
-//     try {
-//       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-//           .collection('debitTransaction') // Replace with your collection name
-//           .where('userID', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-//           .get();
-
-//       double total = 0.0;
-
-//       querySnapshot.docs.forEach((doc) {
-//         total +=
-//             (doc['amount'] ?? 0.0); // Replace 'amount' with your field name
-//       });
-
-//       setState(() {
-//         totalAmount = total.toInt();
-//       });
-//     } catch (e) {
-//       print('Error calculating total amount: $e');
-//     }
-//   }
-// }
-
-
-//Total Borrows
-// Column(
-//                       children: [
-//                         Text(
-//                           'Total Borrowers',
-//                           style: GoogleFonts.inter(
-//                             color: textColor,
-//                             fontSize: 16,
-//                             fontWeight: FontWeight.w600,
-//                             height: 0,
-//                             letterSpacing: -0.32,
-//                           ),
-//                         ),
-//                       ],
-//                     ),
