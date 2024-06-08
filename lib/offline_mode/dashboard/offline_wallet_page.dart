@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:oweflow/localdatabase/local_db.dart'; // Ensure this import is correct
 import 'package:oweflow/offline_mode/featuers/offline_pre_features.dart';
 import 'package:oweflow/utils/colors.dart';
 
@@ -12,44 +13,94 @@ class WalletPageOffline extends StatefulWidget {
 
 class _WalletPageOfflineState extends State<WalletPageOffline> {
   var totalAmount = 0;
+  List<Map<String, dynamic>> currentTransactions = [];
+  List<Map<String, dynamic>> closedTransactions = [];
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    //calculateTotalAmount();
+    fetchTransactions();
+    fetchCompletedTransactions();
+    calculateTotalAmount();
+  }
+
+  Future<void> fetchTransactions() async {
+    try {
+      DatabaseMethod dbMethod = DatabaseMethod();
+      List<Map<String, dynamic>> transactions =
+          await dbMethod.getAllTransactions();
+
+      setState(() {
+        currentTransactions = transactions;
+      });
+    } catch (e) {
+      print('Error fetching transactions: $e');
+    }
+  }
+
+  Future<void> fetchCompletedTransactions() async {
+    try {
+      DatabaseMethod dbMethod = DatabaseMethod();
+      List<Map<String, dynamic>> transactions =
+          await dbMethod.getAllCompletedTransactions();
+
+      setState(() {
+        closedTransactions = transactions;
+      });
+    } catch (e) {
+      print('Error fetching completed transactions: $e');
+    }
+  }
+
+  Future<void> calculateTotalAmount() async {
+    try {
+      DatabaseMethod dbMethod = DatabaseMethod();
+      int amount = await dbMethod.calculateTotalAmount();
+      setState(() {
+        totalAmount = amount;
+      });
+    } catch (e) {
+      print('Error calculating total amount: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          actions: [
-            IconButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (builder) => PremiumFeaturesOffline()));
-                },
-                icon: Icon(
-                  Icons.menu,
-                  color: black,
-                )),
-          ],
-          leading: IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: Icon(Icons.arrow_back)),
-          centerTitle: true,
-          title: Text(
-            "Transaction Details",
-            style: GoogleFonts.plusJakartaSans(
-                color: black, fontWeight: FontWeight.w500, fontSize: 16),
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (builder) => PremiumFeaturesOffline()),
+              );
+            },
+            icon: Icon(
+              Icons.menu,
+              color: black,
+            ),
+          ),
+        ],
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(Icons.arrow_back),
+        ),
+        centerTitle: true,
+        title: Text(
+          "Transaction Details",
+          style: GoogleFonts.plusJakartaSans(
+            color: black,
+            fontWeight: FontWeight.w500,
+            fontSize: 16,
           ),
         ),
-        body: Column(children: [
+      ),
+      body: Column(
+        children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
@@ -79,7 +130,7 @@ class _WalletPageOfflineState extends State<WalletPageOffline> {
                       textAlign: TextAlign.center,
                     ),
                     Text(
-                      '"Total Amount"',
+                      '\$$totalAmount',
                       style: GoogleFonts.inter(
                         color: colorwhite,
                         fontSize: 46,
@@ -102,78 +153,89 @@ class _WalletPageOfflineState extends State<WalletPageOffline> {
           Text(
             "Current Transactions",
             style: GoogleFonts.inter(
-              color: colorwhite,
+              color: Colors.black,
               fontSize: 16,
               fontWeight: FontWeight.w400,
               height: 0,
             ),
           ),
           Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SizedBox(
-                  height: MediaQuery.of(context).size.height / 4,
-                  child: ListView.builder(
-                    itemBuilder: (BuildContext context, int index) {
-                      //String contactNames = data['contact'].join(', ');
-                      return Column(
-                        children: [
-                          ListTile(
+            padding: const EdgeInsets.all(8.0),
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height / 4,
+              child: currentTransactions.isEmpty
+                  ? Center(child: Text('No current transactions available'))
+                  : ListView.builder(
+                      itemCount: currentTransactions.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        var transaction = currentTransactions[index];
+                        return Column(
+                          children: [
+                            ListTile(
                               title: Text(
-                                'Name: "Contact Names"',
+                                'Name: ${transaction['contact_name']}',
                                 style: TextStyle(color: black),
                               ),
                               subtitle: Text(
-                                "Amount",
+                                'Amount: ${transaction['amount'].toString()}',
                                 style: TextStyle(color: black),
                               ),
-                              // Add more fields as needed
                               trailing: Text(
-                                " data['status']",
+                                transaction['status'].toString().toUpperCase(),
                                 style: TextStyle(color: g),
-                              )),
-                          Divider()
-                        ],
-                      );
-                    },
-                  ))),
-
-          //Closed
+                              ),
+                            ),
+                            Divider(),
+                          ],
+                        );
+                      },
+                    ),
+            ),
+          ),
           Text(
             "Closed Transactions",
             style: GoogleFonts.inter(
-              color: colorwhite,
+              color: Colors.black,
               fontSize: 16,
               fontWeight: FontWeight.w400,
               height: 0,
             ),
           ),
           Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SizedBox(
-                  height: MediaQuery.of(context).size.height / 4,
-                  child: ListView.builder(
-                    itemBuilder: (BuildContext context, int index) {
-                      return Column(
-                        children: [
-                          ListTile(
+            padding: const EdgeInsets.all(8.0),
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height / 4,
+              child: closedTransactions.isEmpty
+                  ? Center(child: Text('No closed transactions available'))
+                  : ListView.builder(
+                      itemCount: closedTransactions.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        var transaction = closedTransactions[index];
+                        return Column(
+                          children: [
+                            ListTile(
                               title: Text(
-                                'Name',
+                                'Name: ${transaction['contact_name']}',
                                 style: TextStyle(color: black),
                               ),
                               subtitle: Text(
-                                'Amount',
+                                'Amount: ${transaction['amount'].toString()}',
                                 style: TextStyle(color: black),
                               ),
-                              // Add more fields as needed
                               trailing: Text(
-                                " data['status']",
+                                transaction['date'].toString().toUpperCase(),
                                 style: TextStyle(color: g),
-                              )),
-                          Divider()
-                        ],
-                      );
-                    },
-                  )))
-        ]));
+                              ),
+                            ),
+                            Divider(),
+                          ],
+                        );
+                      },
+                    ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
