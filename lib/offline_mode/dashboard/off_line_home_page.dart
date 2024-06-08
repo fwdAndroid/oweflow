@@ -145,68 +145,83 @@ class _OfflineHomePageState extends State<OfflineHomePage> {
           ),
           SizedBox(
               height: MediaQuery.of(context).size.height / 2.3,
-              child: ListView.builder(
-                itemCount: transactions.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final transaction = transactions[index];
-                  return Card(
-                    elevation: 1,
-                    color: colorwhite,
-                    child: ListTile(
-                      title: Text(
-                        transaction['contact_name'],
+              child: transactions.isEmpty
+                  ? Center(
+                      child: Text(
+                        'No transactions available',
                         style: GoogleFonts.plusJakartaSans(
                           color: black,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
                         ),
                       ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            transaction['notes'],
-                            style: GoogleFonts.plusJakartaSans(
-                              color: black,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
+                    )
+                  : ListView.builder(
+                      itemCount: transactions.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final transaction = transactions[index];
+                        return Card(
+                          elevation: 1,
+                          color: colorwhite,
+                          child: ListTile(
+                            title: Text(
+                              transaction['contact_name'],
+                              style: GoogleFonts.plusJakartaSans(
+                                color: black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  transaction['notes'],
+                                  style: GoogleFonts.plusJakartaSans(
+                                    color: black,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                Text(
+                                  transaction['date'],
+                                  style: GoogleFonts.plusJakartaSans(
+                                    color: black,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  '\$${transaction['amount']}',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    color: black,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                IconButton(
+                                    onPressed: () async {
+                                      await completeTransaction(transaction);
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(SnackBar(
+                                              content: Text(
+                                                  "Transaction is Settled")));
+                                    },
+                                    icon: Icon(
+                                      Icons.check,
+                                      color: g,
+                                    )),
+                              ],
                             ),
                           ),
-                          Text(
-                            transaction['date'],
-                            style: GoogleFonts.plusJakartaSans(
-                              color: black,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            '\$${transaction['amount']}',
-                            style: GoogleFonts.plusJakartaSans(
-                              color: black,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          IconButton(
-                              onPressed: () async {
-                                await completeTransaction(transaction);
-                              },
-                              icon: Icon(
-                                Icons.check,
-                                color: g,
-                              )),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ))
+                        );
+                      },
+                    ))
         ]));
   }
 }

@@ -85,4 +85,9 @@ class DatabaseMethod {
     final db = await database;
     return await db.query('contacts');
   }
+
+  Future<List<Map<String, dynamic>>> getAllCompletedTransactions() async {
+    final db = await database;
+    return await db.query('completedtransactions');
+  }
 }
