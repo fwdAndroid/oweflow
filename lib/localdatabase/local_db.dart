@@ -19,6 +19,9 @@ class DatabaseMethod {
         await db.execute(
           "CREATE TABLE IF NOT EXISTS contacts(id INTEGER PRIMARY KEY, name TEXT, email TEXT, phonenumber TEXT)",
         );
+        await db.execute(
+          "CREATE TABLE IF NOT EXISTS transactionsform(id INTEGER PRIMARY KEY, amount INTEGER, notes TEXT, date TEXT,contact_id INTEGER, contact_name TEXT,FOREIGN KEY(contact_id) REFERENCES contacts(id))",
+        );
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 1) {}
@@ -35,14 +38,17 @@ class DatabaseMethod {
     );
   }
 
+  Future<void> inserttransactionsform(Map<String, dynamic> event) async {
+    final db = await database;
+    await db.insert(
+      'transactionsform',
+      event,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
   Future<List<Map<String, dynamic>>> getAllContacts() async {
     final db = await database;
     return await db.query('contacts');
-  }
-
-  Future<int> getContactsCount() async {
-    final db = await database;
-    final List<Map<String, dynamic>> contacts = await db.query('contacts');
-    return contacts.length;
   }
 }
