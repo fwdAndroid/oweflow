@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:oweflow/localdatabase/local_db.dart';
 import 'package:oweflow/offline_mode/featuers/offline_pre_features.dart';
+import 'package:oweflow/offline_mode/offline_dashboard.dart';
 import 'package:oweflow/utils/buttons.dart';
 import 'package:oweflow/utils/colors.dart';
-import 'package:uuid/uuid.dart';
 
 class AddContactOffline extends StatefulWidget {
   const AddContactOffline({super.key});
@@ -17,7 +18,9 @@ class _AddContactOfflineState extends State<AddContactOffline> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _phoneNumberController = TextEditingController();
   bool isLoading = false;
-  var uuid = Uuid().v4();
+
+  final dbHelper = DatabaseMethod();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -125,6 +128,7 @@ class _AddContactOfflineState extends State<AddContactOffline> {
             padding: const EdgeInsets.all(8),
             child: TextFormField(
               controller: _phoneNumberController,
+              keyboardType: TextInputType.number,
               style: GoogleFonts.dmSans(color: black),
               decoration: InputDecoration(
                   enabledBorder: OutlineInputBorder(
@@ -150,37 +154,7 @@ class _AddContactOfflineState extends State<AddContactOffline> {
                   : Container(
                       width: 150,
                       child: SaveButton(
-                        onTap: () async {
-                          // if (_nameController.text.isEmpty ||
-                          //     _emailController.text.isEmpty ||
-                          //     _phoneNumberController.text.isEmpty) {
-                          //   ScaffoldMessenger.of(context).showSnackBar(
-                          //       SnackBar(content: Text("All Fields Required")));
-                          // } else {
-                          //   setState(() {
-                          //     isLoading = true;
-                          //   });
-                          //   await FirebaseFirestore.instance
-                          //       .collection("contacts")
-                          //       .doc(uuid)
-                          //       .set({
-                          //     "uid": FirebaseAuth.instance.currentUser!.uid,
-                          //     "name": _nameController.text,
-                          //     "email": _emailController.text,
-                          //     "phone": _phoneNumberController.text
-                          //   });
-
-                          //   setState(() {
-                          //     isLoading = false;
-                          //   });
-                          //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          //       content: Text("Contact Added Successfully")));
-                          //   Navigator.push(
-                          //       context,
-                          //       MaterialPageRoute(
-                          //           builder: (builder) => MainDashboard()));
-                          // }
-                        },
+                        onTap: _saveContactToDatabase,
                         title: "Save",
                       ),
                     ),
@@ -205,5 +179,56 @@ class _AddContactOfflineState extends State<AddContactOffline> {
         ],
       ),
     );
+  }
+
+  Future<void> _saveContactToDatabase() async {
+    if (_nameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _phoneNumberController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("All fields are required"),
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    final contact = {
+      'name': _nameController.text.trim(),
+      'email': _emailController.text.trim(),
+      'phonenumber': _phoneNumberController.text.trim(),
+    };
+
+    try {
+      await dbHelper.insertContact(contact);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Contact saved successfully'),
+        ),
+      );
+      setState(() {
+        isLoading = false;
+      });
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => OfflineDashboard(),
+        ),
+      );
+    } catch (e) {
+      print('Error saving contact: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to save contact'),
+        ),
+      );
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 }
