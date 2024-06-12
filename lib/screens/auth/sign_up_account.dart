@@ -14,8 +14,6 @@ class SignUpAccount extends StatefulWidget {
 }
 
 class _SignUpAccountState extends State<SignUpAccount> {
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _lastNameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
@@ -67,36 +65,6 @@ class _SignUpAccountState extends State<SignUpAccount> {
               child: Align(
                 alignment: AlignmentDirectional.topStart,
                 child: Text(
-                  'Your Name',
-                  style: GoogleFonts.plusJakartaSans(
-                      color: black, fontWeight: FontWeight.w500, fontSize: 14),
-                ),
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.only(left: 10, right: 10),
-              padding: const EdgeInsets.all(8),
-              child: TextFormField(
-                controller: _nameController,
-                style: GoogleFonts.dmSans(color: black),
-                decoration: InputDecoration(
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: borderColor)),
-                    errorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: borderColor)),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: borderColor)),
-                    border: OutlineInputBorder(
-                        borderSide: BorderSide(color: borderColor)),
-                    hintText: "First Name",
-                    hintStyle: GoogleFonts.dmSans(color: black, fontSize: 12)),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 16.0, left: 16),
-              child: Align(
-                alignment: AlignmentDirectional.topStart,
-                child: Text(
                   'Your Email',
                   style: GoogleFonts.plusJakartaSans(
                       color: black, fontWeight: FontWeight.w500, fontSize: 14),
@@ -108,6 +76,7 @@ class _SignUpAccountState extends State<SignUpAccount> {
               padding: const EdgeInsets.all(8),
               child: TextFormField(
                 controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
                 style: GoogleFonts.dmSans(color: black),
                 decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(
@@ -171,12 +140,7 @@ class _SignUpAccountState extends State<SignUpAccount> {
                 : SaveButton(
                     title: "Register",
                     onTap: () async {
-                      if (_nameController.text.isEmpty ||
-                          _lastNameController.text.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content:
-                                Text("First Name and Last Name is Required")));
-                      } else if (_emailController.text.isEmpty ||
+                      if (_emailController.text.isEmpty ||
                           _passwordController.text.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                             content: Text("Email or Password is Required")));
@@ -190,8 +154,8 @@ class _SignUpAccountState extends State<SignUpAccount> {
                           email: _emailController.text,
                           password: _passwordController.text,
                           confrimPassword: _passwordController.text,
-                          firstName: _nameController.text,
-                          lastName: _nameController.text);
+                          firstName: "",
+                          lastName: "");
 
                       setState(() {
                         _isLoading = false;
