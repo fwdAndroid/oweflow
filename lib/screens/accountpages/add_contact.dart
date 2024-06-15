@@ -80,66 +80,6 @@ class _AddContactState extends State<AddContact> {
                   hintStyle: GoogleFonts.dmSans(color: black, fontSize: 12)),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 16.0, left: 16),
-            child: Align(
-              alignment: AlignmentDirectional.topStart,
-              child: Text(
-                'Email',
-                style: GoogleFonts.plusJakartaSans(
-                    color: black, fontWeight: FontWeight.w500, fontSize: 14),
-              ),
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.only(left: 10, right: 10),
-            padding: const EdgeInsets.all(8),
-            child: TextFormField(
-              controller: _emailController,
-              style: GoogleFonts.dmSans(color: black),
-              decoration: InputDecoration(
-                  enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  hintText: "Enter Email",
-                  hintStyle: GoogleFonts.dmSans(color: black, fontSize: 12)),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 16.0, left: 16),
-            child: Align(
-              alignment: AlignmentDirectional.topStart,
-              child: Text(
-                'Phone Number',
-                style: GoogleFonts.plusJakartaSans(
-                    color: black, fontWeight: FontWeight.w500, fontSize: 14),
-              ),
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.only(left: 10, right: 10),
-            padding: const EdgeInsets.all(8),
-            child: TextFormField(
-              controller: _phoneNumberController,
-              style: GoogleFonts.dmSans(color: black),
-              decoration: InputDecoration(
-                  enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  hintText: "Enter Phone Number",
-                  hintStyle: GoogleFonts.dmSans(color: black, fontSize: 12)),
-            ),
-          ),
           const SizedBox(
             height: 20,
           ),
@@ -152,9 +92,7 @@ class _AddContactState extends State<AddContact> {
                       width: 150,
                       child: SaveButton(
                         onTap: () async {
-                          if (_nameController.text.isEmpty ||
-                              _emailController.text.isEmpty ||
-                              _phoneNumberController.text.isEmpty) {
+                          if (_nameController.text.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text("All Fields Required")));
                           } else {
@@ -167,8 +105,6 @@ class _AddContactState extends State<AddContact> {
                                 .set({
                               "uid": FirebaseAuth.instance.currentUser!.uid,
                               "name": _nameController.text,
-                              "email": _emailController.text,
-                              "phone": _phoneNumberController.text
                             });
 
                             setState(() {

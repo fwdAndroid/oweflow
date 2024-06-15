@@ -8,6 +8,6 @@ final textColor = Color(0xffE3823C);
 final red = Color(0xFFF95B51);
 final c = Color(0xFF666666);
 final b = Color(0xffE84040);
-final g = Colors.green;
+final g = Color(0xff14AC95);
 final buttonColor = Color(0xff7C5CFC);
 final arrowColor = Color(0xffDBE0E0);

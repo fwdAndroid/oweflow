@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oweflow/screens/accountpages/add_contact.dart';
 import 'package:oweflow/screens/accountpages/premium_features.dart';
@@ -23,9 +24,12 @@ class _TransactionFormState extends State<TransactionForm> {
   TextEditingController _amountController = TextEditingController();
   TextEditingController _notesController = TextEditingController();
   TextEditingController _dateController = TextEditingController();
+  TextEditingController _dateControllerEnd = TextEditingController();
   var _value = false;
   bool _isLoading = false;
-  List<String> selectedContacts = [];
+  String? _selectedValue = 'Received';
+  String? selectedContact; // Add this line to store the selected contact
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,72 +67,8 @@ class _TransactionFormState extends State<TransactionForm> {
               ),
               InkWell(
                 onTap: () {
-                  showDialog<void>(
-                    context: context,
-                    barrierDismissible: false, // user must tap button!
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text('Select Contacts'),
-                        content: StatefulBuilder(builder:
-                            (BuildContext context, StateSetter setState) {
-                          return FutureBuilder(
-                            future: fetchContacts(),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return CircularProgressIndicator();
-                              } else if (snapshot.hasError) {
-                                return Text('Error: ${snapshot.error}');
-                              } else {
-                                List<String> contacts =
-                                    snapshot.data as List<String>;
-
-                                return Column(
-                                  children: [
-                                    for (String contact in contacts)
-                                      CheckboxListTile(
-                                        title: Text(contact),
-                                        value:
-                                            selectedContacts.contains(contact),
-                                        onChanged: (bool? value) {
-                                          setState(() {
-                                            if (value!) {
-                                              selectedContacts.add(contact);
-                                            } else {
-                                              selectedContacts.remove(contact);
-                                            }
-                                          });
-                                        },
-                                      ),
-                                  ],
-                                );
-                              }
-                            },
-                          );
-                        }),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (builder) => AddContact()));
-                            },
-                            child: Text('Add New Contact'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              // Do something with selectedContacts
-                              // For now, just print them
-                              print('Selected Contacts: $selectedContacts');
-                              Navigator.pop(context);
-                            },
-                            child: Text('OK'),
-                          ),
-                        ],
-                      );
-                    },
-                  );
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (builder) => AddContact()));
                 },
                 child: Text(
                   'Add Contact',
@@ -141,21 +81,115 @@ class _TransactionFormState extends State<TransactionForm> {
                   ),
                 ),
               ),
-              for (String contact in selectedContacts)
-                Text(contact,
-                    style: TextStyle(fontSize: 16, color: colorwhite)),
               Padding(
-                padding: const EdgeInsets.only(top: 16.0, left: 16),
+                padding: const EdgeInsets.all(8.0),
                 child: Align(
                   alignment: AlignmentDirectional.topStart,
                   child: Text(
-                    'Amount',
+                    'Recent Contacts',
+                    textAlign: TextAlign.center,
                     style: GoogleFonts.plusJakartaSans(
                         color: black,
                         fontWeight: FontWeight.w500,
                         fontSize: 14),
                   ),
                 ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(8),
+                child: StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection("contacts")
+                        .where("uid",
+                            isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                        .snapshots(),
+                    builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      } else if (!snapshot.hasData ||
+                          snapshot.data!.docs.isEmpty) {
+                        return Center(
+                          child: Text(
+                            "No Chat Started Yet",
+                            style: TextStyle(color: Colors.black),
+                          ),
+                        );
+                      }
+                      return SizedBox(
+                        height: 70,
+                        width: MediaQuery.of(context).size.width,
+                        child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: snapshot.data!.docs.length,
+                            itemBuilder: (context, index) {
+                              final List<DocumentSnapshot> documents =
+                                  snapshot.data!.docs;
+                              final Map<String, dynamic> data = documents[index]
+                                  .data() as Map<String, dynamic>;
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    selectedContact = data['name'];
+                                  });
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    width: 100,
+                                    height: 100,
+                                    decoration: BoxDecoration(
+                                        color: selectedContact == data['name']
+                                            ? Colors
+                                                .green // Change color to green when selected
+                                            : Colors.white,
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(15))),
+                                    child: Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          data['name'],
+                                          style: GoogleFonts.plusJakartaSans(
+                                              color: black,
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 14),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }),
+                      );
+                    }),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Radio<String>(
+                    value: 'Received',
+                    groupValue: _selectedValue,
+                    onChanged: (String? value) {
+                      setState(() {
+                        _selectedValue = value;
+                      });
+                    },
+                  ),
+                  Text('Received'),
+                  Radio<String>(
+                    value: 'Gave',
+                    groupValue: _selectedValue,
+                    onChanged: (String? value) {
+                      setState(() {
+                        _selectedValue = value;
+                      });
+                    },
+                  ),
+                  Text('Gave'),
+                ],
               ),
               Container(
                 margin: const EdgeInsets.only(left: 10, right: 10),
@@ -174,22 +208,9 @@ class _TransactionFormState extends State<TransactionForm> {
                       border: OutlineInputBorder(
                           borderSide: BorderSide(color: borderColor)),
                       hintText: "Transaction Amount",
-                      labelText: "\$345",
+                      labelText: "Amount",
                       hintStyle:
                           GoogleFonts.dmSans(color: colorwhite, fontSize: 12)),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0, left: 16),
-                child: Align(
-                  alignment: AlignmentDirectional.topStart,
-                  child: Text(
-                    'Notes',
-                    style: GoogleFonts.plusJakartaSans(
-                        color: black,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14),
-                  ),
                 ),
               ),
               Container(
@@ -197,7 +218,7 @@ class _TransactionFormState extends State<TransactionForm> {
                 padding: const EdgeInsets.all(8),
                 child: TextFormField(
                   controller: _notesController,
-                  maxLines: 3,
+                  maxLines: 1,
                   style: GoogleFonts.dmSans(color: black),
                   decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
@@ -208,22 +229,9 @@ class _TransactionFormState extends State<TransactionForm> {
                           borderSide: BorderSide(color: borderColor)),
                       border: OutlineInputBorder(
                           borderSide: BorderSide(color: borderColor)),
-                      hintText: "Notes",
+                      hintText: "Description",
                       hintStyle:
                           GoogleFonts.dmSans(color: black, fontSize: 12)),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0, left: 16),
-                child: Align(
-                  alignment: AlignmentDirectional.topStart,
-                  child: Text(
-                    'Date',
-                    style: GoogleFonts.plusJakartaSans(
-                        color: black,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14),
-                  ),
                 ),
               ),
               Container(
@@ -237,7 +245,7 @@ class _TransactionFormState extends State<TransactionForm> {
                   style: GoogleFonts.dmSans(color: black),
                   decoration: InputDecoration(
                       suffixIcon: Icon(
-                        Icons.calendar_today,
+                        Icons.keyboard_arrow_down,
                         color: black,
                       ),
                       enabledBorder: OutlineInputBorder(
@@ -249,6 +257,35 @@ class _TransactionFormState extends State<TransactionForm> {
                       border: OutlineInputBorder(
                           borderSide: BorderSide(color: borderColor)),
                       hintText: "Date",
+                      labelText: "Date",
+                      hintStyle:
+                          GoogleFonts.dmSans(color: black, fontSize: 12)),
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(left: 10, right: 10),
+                padding: const EdgeInsets.all(8),
+                child: TextFormField(
+                  onTap: () {
+                    _selectDateEnd(); // Call Function that has showDatePicker()
+                  },
+                  controller: _dateControllerEnd,
+                  style: GoogleFonts.dmSans(color: black),
+                  decoration: InputDecoration(
+                      suffixIcon: Icon(
+                        Icons.keyboard_arrow_down,
+                        color: black,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: borderColor)),
+                      errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: borderColor)),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: borderColor)),
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(color: borderColor)),
+                      hintText: "Due Date",
+                      labelText: "Due Date",
                       hintStyle:
                           GoogleFonts.dmSans(color: black, fontSize: 12)),
                 ),
@@ -268,10 +305,10 @@ class _TransactionFormState extends State<TransactionForm> {
                       ),
                     ),
                     Text(
-                      'Activate',
+                      'Activate Premium',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.inter(
-                        color: buttonColor,
+                        color: g,
                         fontSize: 10,
                         fontWeight: FontWeight.w400,
                       ),
@@ -332,7 +369,7 @@ class _TransactionFormState extends State<TransactionForm> {
                       title: "Save",
                       onTap: () async {
                         var uuid = Uuid().v4();
-                        if (selectedContacts.isEmpty) {
+                        if (selectedContact == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text("Contact is Required")));
                         } else if (_amountController.text.isEmpty) {
@@ -354,11 +391,12 @@ class _TransactionFormState extends State<TransactionForm> {
                               .set({
                             "userID": FirebaseAuth.instance.currentUser!.uid,
                             "uuid": uuid,
-                            "contact": selectedContacts,
+                            "contact": selectedContact,
                             "amount": int.parse(_amountController.text),
                             "date": _dateController.text.trim(),
+                            "duedate": _dateControllerEnd.text.trim(),
                             "notes": _notesController.text,
-                            "status": "open"
+                            "status": _selectedValue
                           });
                           setState(() {
                             _isLoading = false;
@@ -370,7 +408,6 @@ class _TransactionFormState extends State<TransactionForm> {
                           ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text("Debit is Created")));
                         }
-                        ;
                       })
             ],
           ),
@@ -394,19 +431,19 @@ class _TransactionFormState extends State<TransactionForm> {
     }
   }
 
-  Future<List<String>> fetchContacts() async {
-    // Replace 'your_collection_name' with the actual name of your Firestore collection
-    QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('contacts').get();
+  void _selectDateEnd() async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
 
-    List<String> contacts = [];
-
-    querySnapshot.docs.forEach((doc) {
-      // Assuming each document in the collection has a field with the contact name
-      String contactName = doc['name'];
-      contacts.add(contactName);
-    });
-
-    return contacts;
+    if (pickedDate != null && pickedDate != DateTime.now()) {
+      // Update the text field with the selected date
+      setState(() {
+        _dateControllerEnd.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+      });
+    }
   }
 }
