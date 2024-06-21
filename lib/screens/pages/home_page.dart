@@ -5,6 +5,8 @@ import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oweflow/screens/accountpages/personalprofile.dart';
 import 'package:oweflow/screens/accountpages/premium_features.dart';
+import 'package:oweflow/screens/pages/tab_pages/browers.dart';
+import 'package:oweflow/screens/pages/tab_pages/lenders.dart';
 import 'package:oweflow/utils/colors.dart';
 
 class HomePage extends StatefulWidget {
@@ -110,18 +112,30 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
-                  Image.asset(
-                    "assets/Card.png",
-                    height: 90,
-                    width: 90,
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (builder) => Lenders()));
+                    },
+                    child: Image.asset(
+                      "assets/Card.png",
+                      height: 90,
+                      width: 90,
+                    ),
                   ),
                   const SizedBox(
                     width: 7,
                   ),
-                  Image.asset(
-                    "assets/Card (1).png",
-                    height: 90,
-                    width: 90,
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (builder) => Borrowers()));
+                    },
+                    child: Image.asset(
+                      "assets/Card (1).png",
+                      height: 90,
+                      width: 90,
+                    ),
                   ),
                   const SizedBox(
                     width: 7,
