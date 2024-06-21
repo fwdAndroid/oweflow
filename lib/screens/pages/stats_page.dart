@@ -134,11 +134,11 @@ class _StatsPageState extends State<StatsPage> {
                       itemBuilder: (context, index) {
                         var data = filteredEvents[index].data()
                             as Map<String, dynamic>;
-                        String contactNames = data['contact'].join(', ');
+
                         return Card(
                             child: ListTile(
                           title: Text(
-                            'Name: $contactNames',
+                            data['contact'],
                             style: TextStyle(color: textColor),
                           ),
                           subtitle: Text(

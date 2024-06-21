@@ -103,7 +103,7 @@ class _WalletPageState extends State<WalletPage> {
           Text(
             "Current Transactions",
             style: GoogleFonts.inter(
-              color: colorwhite,
+              color: black,
               fontSize: 16,
               fontWeight: FontWeight.w400,
               height: 0,
@@ -136,12 +136,12 @@ class _WalletPageState extends State<WalletPage> {
                           snapshot.data!.docs;
                       final Map<String, dynamic> data =
                           documents[index].data() as Map<String, dynamic>;
-                      String contactNames = data['contact'].join(', ');
+
                       return Column(
                         children: [
                           ListTile(
                               title: Text(
-                                'Name: $contactNames',
+                                data['contact'],
                                 style: TextStyle(color: black),
                               ),
                               subtitle: Text(
@@ -204,7 +204,7 @@ class _WalletPageState extends State<WalletPage> {
                         children: [
                           ListTile(
                               title: Text(
-                                'Name: ${data['contact'].toString()}',
+                                data['contact'],
                                 style: TextStyle(color: black),
                               ),
                               subtitle: Text(
