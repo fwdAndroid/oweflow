@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oweflow/screens/accountpages/premium_features.dart';
 import 'package:oweflow/screens/pages/tab_pages/edit_lend_page.dart';
+import 'package:oweflow/screens/view/view_transaction.dart';
 import 'package:oweflow/utils/colors.dart';
 
 class WalletPage extends StatefulWidget {
@@ -141,6 +142,14 @@ class _WalletPageState extends State<WalletPage> {
                       return Column(
                         children: [
                           ListTile(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (builder) => ViewTransaction(
+                                              document: data,
+                                            )));
+                              },
                               title: Text(
                                 data['contact'],
                                 style: TextStyle(color: black),
@@ -273,6 +282,15 @@ class _WalletPageState extends State<WalletPage> {
                           child: Column(
                             children: [
                               ListTile(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (builder) =>
+                                                ViewTransaction(
+                                                  document: data,
+                                                )));
+                                  },
                                   title: Text(
                                     data['contact'],
                                     style: TextStyle(color: black),

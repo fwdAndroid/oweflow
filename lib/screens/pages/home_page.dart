@@ -9,6 +9,7 @@ import 'package:oweflow/screens/accountpages/premium_features.dart';
 import 'package:oweflow/screens/pages/tab_pages/browers.dart';
 import 'package:oweflow/screens/pages/tab_pages/edit_lend_page.dart';
 import 'package:oweflow/screens/pages/tab_pages/lenders.dart';
+import 'package:oweflow/screens/view/view_transaction.dart';
 import 'package:oweflow/utils/colors.dart';
 
 class HomePage extends StatefulWidget {
@@ -283,6 +284,14 @@ class _HomePageState extends State<HomePage> {
                           elevation: 1,
                           color: colorwhite,
                           child: ListTile(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (builder) => ViewTransaction(
+                                            document: data,
+                                          )));
+                            },
                             title: Text(
                               data['contact'],
                               style: GoogleFonts.plusJakartaSans(
@@ -331,74 +340,6 @@ class _HomePageState extends State<HomePage> {
                                     fontWeight: FontWeight.w400,
                                   ),
                                 ),
-
-                                // IconButton(
-                                //   onPressed: () {
-                                //     showDialog<void>(
-                                //       context: context,
-                                //       barrierDismissible:
-                                //           false, // user must tap button!
-                                //       builder: (BuildContext context) {
-                                //         return AlertDialog(
-                                //           title: const Text('Debt Information'),
-                                //           content: SingleChildScrollView(
-                                //             child: ListTile(
-                                //               title: Text(
-                                //                 data['contact'],
-                                //                 style: TextStyle(color: black),
-                                //               ),
-                                //               subtitle: Text(
-                                //                 data['date'],
-                                //                 style: TextStyle(color: black),
-                                //               ),
-                                //               trailing: Text(
-                                //                 '${data['amount'].toString()}\$',
-                                //                 style: TextStyle(color: black),
-                                //               ),
-                                //             ),
-                                //           ),
-                                //           actions: <Widget>[
-                                //             TextButton(
-                                //               child: const Text('Done'),
-                                //               onPressed: () async {
-                                //                 print("object");
-                                //                 await FirebaseFirestore.instance
-                                //                     .collection("closedTransaction")
-                                //                     .doc(data['uuid'])
-                                //                     .set(
-                                //                   {
-                                //                     "status": "closed",
-                                //                     "amount": 0,
-                                //                     "notes": data['notes'],
-                                //                     "userID": data['userID'],
-                                //                     "uuid": data['uuid'],
-                                //                     "contact": data['contact'],
-                                //                     "date": data['date']
-                                //                   },
-                                //                 );
-                                //                 await FirebaseFirestore.instance
-                                //                     .collection("debitTransaction")
-                                //                     .doc(data['uuid'])
-                                //                     .delete();
-                                //                 Navigator.of(context).pop();
-                                //               },
-                                //             ),
-                                //             TextButton(
-                                //               child: const Text('Close'),
-                                //               onPressed: () {
-                                //                 Navigator.of(context).pop();
-                                //               },
-                                //             ),
-                                //           ],
-                                //         );
-                                //       },
-                                //     );
-                                //   },
-                                //   icon: Icon(
-                                //     Icons.check,
-                                //     color: g,
-                                //   ),
-                                // ),
                               ],
                             ),
                           ),
