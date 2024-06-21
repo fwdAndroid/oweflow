@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oweflow/screens/accountpages/personalprofile.dart';
 import 'package:oweflow/screens/accountpages/premium_features.dart';
+import 'package:oweflow/screens/pages/tab_pages/edit_lend_page.dart';
 import 'package:oweflow/utils/colors.dart';
 
 class Borrowers extends StatefulWidget {
@@ -140,131 +141,134 @@ class _BorrowersState extends State<Borrowers> {
                         String message =
                             isReceived ? "You Borrowed" : "You Lent";
 
-                        return Column(
-                          children: [
-                            ListTile(
-                              trailing: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    message,
+                        return Dismissible(
+                            key: Key(documents[index].id),
+                            confirmDismiss: (DismissDirection direction) async {
+                              if (direction == DismissDirection.endToStart) {
+                                return await showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text("Confirm"),
+                                      content: Text(
+                                          "Are you sure you want to delete this item?"),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(false),
+                                          child: Text("Cancel"),
+                                        ),
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(true),
+                                          child: Text("Delete"),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              } else if (direction ==
+                                  DismissDirection.startToEnd) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        EditLendPage(document: data),
+                                  ),
+                                );
+                                return false;
+                              }
+                              return false;
+                            },
+                            onDismissed: (DismissDirection direction) async {
+                              if (direction == DismissDirection.endToStart) {
+                                await FirebaseFirestore.instance
+                                    .collection('debitTransaction')
+                                    .doc(documents[index].id)
+                                    .delete();
+                                setState(() {
+                                  documents.removeAt(index);
+                                });
+                              }
+                            },
+                            background: Container(
+                                color: Colors.green,
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 16.0),
+                                    child:
+                                        Icon(Icons.edit, color: Colors.white),
+                                  ),
+                                )),
+                            secondaryBackground: Container(
+                                color: Colors.red,
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(right: 16.0),
+                                    child:
+                                        Icon(Icons.delete, color: Colors.white),
+                                  ),
+                                )),
+                            child: Column(
+                              children: [
+                                ListTile(
+                                  trailing: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        message,
+                                        style: GoogleFonts.plusJakartaSans(
+                                          color: amountColor,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                      Text(
+                                        "\$" + data['amount'].toString(),
+                                        style: GoogleFonts.plusJakartaSans(
+                                          color: amountColor,
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  title: Text(
+                                    data['contact'],
                                     style: GoogleFonts.plusJakartaSans(
-                                      color: amountColor,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
+                                      color: black,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
-                                  Text(
-                                    "\$" + data['amount'].toString(),
-                                    style: GoogleFonts.plusJakartaSans(
-                                      color: amountColor,
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.w400,
-                                    ),
+                                  subtitle: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        data['notes'],
+                                        style: GoogleFonts.plusJakartaSans(
+                                          color: black,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                      Text(
+                                        data['date'],
+                                        style: GoogleFonts.plusJakartaSans(
+                                          color: black,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-
-                                  // IconButton(
-                                  //   onPressed: () {
-                                  //     showDialog<void>(
-                                  //       context: context,
-                                  //       barrierDismissible:
-                                  //           false, // user must tap button!
-                                  //       builder: (BuildContext context) {
-                                  //         return AlertDialog(
-                                  //           title: const Text('Debt Information'),
-                                  //           content: SingleChildScrollView(
-                                  //             child: ListTile(
-                                  //               title: Text(
-                                  //                 data['contact'],
-                                  //                 style: TextStyle(color: black),
-                                  //               ),
-                                  //               subtitle: Text(
-                                  //                 data['date'],
-                                  //                 style: TextStyle(color: black),
-                                  //               ),
-                                  //               trailing: Text(
-                                  //                 '${data['amount'].toString()}\$',
-                                  //                 style: TextStyle(color: black),
-                                  //               ),
-                                  //             ),
-                                  //           ),
-                                  //           actions: <Widget>[
-                                  //             TextButton(
-                                  //               child: const Text('Done'),
-                                  //               onPressed: () async {
-                                  //                 print("object");
-                                  //                 await FirebaseFirestore.instance
-                                  //                     .collection("closedTransaction")
-                                  //                     .doc(data['uuid'])
-                                  //                     .set(
-                                  //                   {
-                                  //                     "status": "closed",
-                                  //                     "amount": 0,
-                                  //                     "notes": data['notes'],
-                                  //                     "userID": data['userID'],
-                                  //                     "uuid": data['uuid'],
-                                  //                     "contact": data['contact'],
-                                  //                     "date": data['date']
-                                  //                   },
-                                  //                 );
-                                  //                 await FirebaseFirestore.instance
-                                  //                     .collection("debitTransaction")
-                                  //                     .doc(data['uuid'])
-                                  //                     .delete();
-                                  //                 Navigator.of(context).pop();
-                                  //               },
-                                  //             ),
-                                  //             TextButton(
-                                  //               child: const Text('Close'),
-                                  //               onPressed: () {
-                                  //                 Navigator.of(context).pop();
-                                  //               },
-                                  //             ),
-                                  //           ],
-                                  //         );
-                                  //       },
-                                  //     );
-                                  //   },
-                                  //   icon: Icon(
-                                  //     Icons.check,
-                                  //     color: g,
-                                  //   ),
-                                  // ),
-                                ],
-                              ),
-                              title: Text(
-                                data['contact'],
-                                style: GoogleFonts.plusJakartaSans(
-                                  color: black,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
                                 ),
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    data['notes'],
-                                    style: GoogleFonts.plusJakartaSans(
-                                      color: black,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                  Text(
-                                    data['date'],
-                                    style: GoogleFonts.plusJakartaSans(
-                                      color: black,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Divider()
-                          ],
-                        );
+                                Divider()
+                              ],
+                            ));
                       });
                 }),
           ),
