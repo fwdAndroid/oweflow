@@ -5,6 +5,7 @@ import 'package:oweflow/offline_mode/dashboard/records/borrower_offline.dart';
 import 'package:oweflow/offline_mode/dashboard/records/lenders_offline.dart';
 import 'package:oweflow/offline_mode/featuers/offline_pre_features.dart';
 import 'package:oweflow/offline_mode/off_line_edit/edit_lend_page_offline.dart';
+import 'package:oweflow/screens/accountpages/currency_exchange.dart';
 import 'package:oweflow/utils/colors.dart';
 
 class OfflineHomePage extends StatefulWidget {
@@ -172,10 +173,10 @@ class _OfflineHomePageState extends State<OfflineHomePage> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      // Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //         builder: (builder) => CurrencyExchange()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (builder) => CurrencyExchange()));
                     },
                     child: Image.asset(
                       "assets/Card (2).png",

@@ -53,14 +53,6 @@ class _CurrencyExchangeState extends State<CurrencyExchange> {
     TextEditingController _amountController = TextEditingController();
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          IconButton(
-              onPressed: () {
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (builder) => Noti()));
-              },
-              icon: Icon(Icons.notifications))
-        ],
         leading: IconButton(
             onPressed: () {
               Navigator.pop(context);
