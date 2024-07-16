@@ -101,4 +101,16 @@ class DatabaseMethod {
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
+
+  Future<List<Map<String, dynamic>>> getAllTransactionsGave() async {
+    final db = await database;
+    return await db
+        .query('transactionsform', where: 'status = ?', whereArgs: ['Gave']);
+  }
+
+  Future<List<Map<String, dynamic>>> getAllTransactionsReceived() async {
+    final db = await database;
+    return await db.query('transactionsform',
+        where: 'status = ?', whereArgs: ['Received']);
+  }
 }

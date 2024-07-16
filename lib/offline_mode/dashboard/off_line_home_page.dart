@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oweflow/localdatabase/local_db.dart';
+import 'package:oweflow/offline_mode/dashboard/records/borrower_offline.dart';
+import 'package:oweflow/offline_mode/dashboard/records/lenders_offline.dart';
 import 'package:oweflow/offline_mode/featuers/offline_pre_features.dart';
 import 'package:oweflow/offline_mode/off_line_edit/edit_lend_page_offline.dart';
 import 'package:oweflow/utils/colors.dart';
@@ -138,8 +140,10 @@ class _OfflineHomePageState extends State<OfflineHomePage> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      // Navigator.push(context,
-                      //     MaterialPageRoute(builder: (builder) => Lenders()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (builder) => LendersOffline()));
                     },
                     child: Image.asset(
                       "assets/Card.png",
@@ -152,8 +156,10 @@ class _OfflineHomePageState extends State<OfflineHomePage> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      // Navigator.push(context,
-                      //     MaterialPageRoute(builder: (builder) => Borrowers()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (builder) => BorrowersOffline()));
                     },
                     child: Image.asset(
                       "assets/Card (1).png",
