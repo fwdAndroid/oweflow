@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oweflow/localdatabase/local_db.dart';
 import 'package:oweflow/offline_mode/featuers/offline_pre_features.dart';
+import 'package:oweflow/offline_mode/off_line_edit/edit_lend_page_offline.dart';
 import 'package:oweflow/utils/colors.dart';
 
 class OfflineHomePage extends StatefulWidget {
@@ -225,59 +226,129 @@ class _OfflineHomePageState extends State<OfflineHomePage> {
                         String message =
                             isReceived ? "You Borrowed" : "You Lent";
 
-                        return Card(
-                          elevation: 1,
-                          color: colorwhite,
-                          child: ListTile(
-                            title: Text(
-                              transaction['contact_name'],
-                              style: GoogleFonts.plusJakartaSans(
-                                color: black,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
+                        return Dismissible(
+                          key: Key(transaction['id'].toString()),
+                          confirmDismiss: (DismissDirection direction) async {
+                            if (direction == DismissDirection.endToStart) {
+                              return await showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text("Confirm"),
+                                    content: Text(
+                                        "Are you sure you want to delete this item?"),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(false),
+                                        child: Text("Cancel"),
+                                      ),
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(true),
+                                        child: Text("Delete"),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            } else if (direction ==
+                                DismissDirection.startToEnd) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => EditLendPageOffline(
+                                      document: transaction),
+                                ),
+                              );
+                              return false;
+                            }
+                            return false;
+                          },
+                          onDismissed: (DismissDirection direction) async {
+                            if (direction == DismissDirection.endToStart) {
+                              // delete transaction detail in SQlite database and here'
+                              DatabaseMethod dbMethod = DatabaseMethod();
+                              await dbMethod
+                                  .deleteTransaction(transaction['id']);
+                              setState(() {
+                                transactions.removeAt(index);
+                              });
+                            }
+                          },
+                          background: Container(
+                              color: Colors.green,
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 16.0),
+                                  child: Icon(Icons.edit, color: Colors.white),
+                                ),
+                              )),
+                          secondaryBackground: Container(
+                              color: Colors.red,
+                              child: Align(
+                                alignment: Alignment.centerRight,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 16.0),
+                                  child:
+                                      Icon(Icons.delete, color: Colors.white),
+                                ),
+                              )),
+                          child: Card(
+                            elevation: 1,
+                            color: colorwhite,
+                            child: ListTile(
+                              title: Text(
+                                transaction['contact_name'],
+                                style: GoogleFonts.plusJakartaSans(
+                                  color: black,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  transaction['notes'],
-                                  style: GoogleFonts.plusJakartaSans(
-                                    color: black,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    transaction['notes'],
+                                    style: GoogleFonts.plusJakartaSans(
+                                      color: black,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400,
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  transaction['date'],
-                                  style: GoogleFonts.plusJakartaSans(
-                                    color: black,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
+                                  Text(
+                                    transaction['date'],
+                                    style: GoogleFonts.plusJakartaSans(
+                                      color: black,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            trailing: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  message,
-                                  style: GoogleFonts.plusJakartaSans(
-                                    color: amountColor,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
+                                ],
+                              ),
+                              trailing: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    message,
+                                    style: GoogleFonts.plusJakartaSans(
+                                      color: amountColor,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400,
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  '\$${transaction['amount']}',
-                                  style: GoogleFonts.plusJakartaSans(
-                                    color: black,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
+                                  Text(
+                                    '\$${transaction['amount']}',
+                                    style: GoogleFonts.plusJakartaSans(
+                                      color: black,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         );

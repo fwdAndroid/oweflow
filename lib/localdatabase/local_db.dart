@@ -90,4 +90,15 @@ class DatabaseMethod {
     final db = await database;
     return await db.query('completedtransactions');
   }
+
+  Future<void> updateTransaction(Map<String, dynamic> transaction) async {
+    final db = await database;
+    await db.update(
+      'transactionsform',
+      transaction,
+      where: 'id = ?',
+      whereArgs: [transaction['id']],
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
 }
