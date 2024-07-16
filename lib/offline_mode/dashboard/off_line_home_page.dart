@@ -129,10 +129,69 @@ class _OfflineHomePageState extends State<OfflineHomePage> {
               ),
             ),
           ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      // Navigator.push(context,
+                      //     MaterialPageRoute(builder: (builder) => Lenders()));
+                    },
+                    child: Image.asset(
+                      "assets/Card.png",
+                      height: 90,
+                      width: 90,
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 7,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      // Navigator.push(context,
+                      //     MaterialPageRoute(builder: (builder) => Borrowers()));
+                    },
+                    child: Image.asset(
+                      "assets/Card (1).png",
+                      height: 90,
+                      width: 90,
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 7,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      // Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //         builder: (builder) => CurrencyExchange()));
+                    },
+                    child: Image.asset(
+                      "assets/Card (2).png",
+                      height: 90,
+                      width: 90,
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 7,
+                  ),
+                  Image.asset(
+                    "assets/Card (3).png",
+                    height: 90,
+                    width: 90,
+                  )
+                ],
+              ),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              'Transactions',
+              'Last Transactions',
               style: GoogleFonts.inter(
                 color: black,
                 fontSize: 20,
@@ -160,6 +219,12 @@ class _OfflineHomePageState extends State<OfflineHomePage> {
                       itemCount: transactions.length,
                       itemBuilder: (BuildContext context, int index) {
                         final transaction = transactions[index];
+                        bool isReceived = transaction['status'] == 'Received';
+                        Color amountColor =
+                            isReceived ? Colors.green : Colors.red;
+                        String message =
+                            isReceived ? "You Borrowed" : "You Lent";
+
                         return Card(
                           elevation: 1,
                           color: colorwhite,
@@ -193,9 +258,17 @@ class _OfflineHomePageState extends State<OfflineHomePage> {
                                 ),
                               ],
                             ),
-                            trailing: Row(
+                            trailing: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
+                                Text(
+                                  message,
+                                  style: GoogleFonts.plusJakartaSans(
+                                    color: amountColor,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
                                 Text(
                                   '\$${transaction['amount']}',
                                   style: GoogleFonts.plusJakartaSans(
@@ -204,18 +277,6 @@ class _OfflineHomePageState extends State<OfflineHomePage> {
                                     fontWeight: FontWeight.w400,
                                   ),
                                 ),
-                                IconButton(
-                                    onPressed: () async {
-                                      await completeTransaction(transaction);
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(SnackBar(
-                                              content: Text(
-                                                  "Transaction is Settled")));
-                                    },
-                                    icon: Icon(
-                                      Icons.check,
-                                      color: g,
-                                    )),
                               ],
                             ),
                           ),

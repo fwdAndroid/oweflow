@@ -15,8 +15,6 @@ class AddContactOffline extends StatefulWidget {
 
 class _AddContactOfflineState extends State<AddContactOffline> {
   TextEditingController _nameController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _phoneNumberController = TextEditingController();
   bool isLoading = false;
 
   final dbHelper = DatabaseMethod();
@@ -82,67 +80,6 @@ class _AddContactOfflineState extends State<AddContactOffline> {
                   hintStyle: GoogleFonts.dmSans(color: black, fontSize: 12)),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 16.0, left: 16),
-            child: Align(
-              alignment: AlignmentDirectional.topStart,
-              child: Text(
-                'Email',
-                style: GoogleFonts.plusJakartaSans(
-                    color: black, fontWeight: FontWeight.w500, fontSize: 14),
-              ),
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.only(left: 10, right: 10),
-            padding: const EdgeInsets.all(8),
-            child: TextFormField(
-              controller: _emailController,
-              style: GoogleFonts.dmSans(color: black),
-              decoration: InputDecoration(
-                  enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  hintText: "Enter Email",
-                  hintStyle: GoogleFonts.dmSans(color: black, fontSize: 12)),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 16.0, left: 16),
-            child: Align(
-              alignment: AlignmentDirectional.topStart,
-              child: Text(
-                'Phone Number',
-                style: GoogleFonts.plusJakartaSans(
-                    color: black, fontWeight: FontWeight.w500, fontSize: 14),
-              ),
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.only(left: 10, right: 10),
-            padding: const EdgeInsets.all(8),
-            child: TextFormField(
-              controller: _phoneNumberController,
-              keyboardType: TextInputType.number,
-              style: GoogleFonts.dmSans(color: black),
-              decoration: InputDecoration(
-                  enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: borderColor)),
-                  hintText: "Enter Phone Number",
-                  hintStyle: GoogleFonts.dmSans(color: black, fontSize: 12)),
-            ),
-          ),
           const SizedBox(
             height: 20,
           ),
@@ -182,9 +119,7 @@ class _AddContactOfflineState extends State<AddContactOffline> {
   }
 
   Future<void> _saveContactToDatabase() async {
-    if (_nameController.text.isEmpty ||
-        _emailController.text.isEmpty ||
-        _phoneNumberController.text.isEmpty) {
+    if (_nameController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("All fields are required"),
@@ -199,8 +134,6 @@ class _AddContactOfflineState extends State<AddContactOffline> {
 
     final contact = {
       'name': _nameController.text.trim(),
-      'email': _emailController.text.trim(),
-      'phonenumber': _phoneNumberController.text.trim(),
     };
 
     try {

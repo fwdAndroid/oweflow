@@ -18,9 +18,15 @@ class _OfflineTransactionFormState extends State<OfflineTransactionForm> {
   TextEditingController _amountController = TextEditingController();
   TextEditingController _notesController = TextEditingController();
   TextEditingController _dateController = TextEditingController();
+  TextEditingController _dateControllerEnd = TextEditingController();
+
   bool _isLoading = false;
   List<Map<String, dynamic>> contacts = [];
-  List<Map<String, dynamic>> selectedContacts = [];
+  String? selectedContactId;
+  String? selectedContactName;
+
+  String? _selectedValue = 'Received';
+  var _value = false;
 
   @override
   void initState() {
@@ -72,24 +78,62 @@ class _OfflineTransactionFormState extends State<OfflineTransactionForm> {
             const SizedBox(
               height: 20,
             ),
-            InkWell(
-              onTap: () {
-                _showContactDialog();
-              },
-              child: Text(
-                'Add Contact',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
-                  color: buttonColor,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w600,
-                  height: 0,
-                ),
-              ),
+            TextButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (builder) => AddContactOffline()));
+                },
+                child: Text("Add Contact")),
+            SizedBox(
+              height: 70,
+              width: MediaQuery.of(context).size.width,
+              child: contacts.isNotEmpty
+                  ? ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: contacts.length,
+                      itemBuilder: (context, index) {
+                        var contact = contacts[index];
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedContactId = contact['id'].toString();
+                              selectedContactName = contact['name'];
+                            });
+                            print(selectedContactName);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              width: 100,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                  color: selectedContactName == contact['name']
+                                      ? Colors
+                                          .green // Change color to green when selected
+                                      : Colors.white,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15))),
+                              child: Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    contact['name'],
+                                    style: GoogleFonts.plusJakartaSans(
+                                        color: black,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 14),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      })
+                  : Text("No Contact Found Yet"),
             ),
-            for (var contact in selectedContacts)
-              Text(contact['name'],
-                  style: TextStyle(fontSize: 16, color: colorwhite)),
             Padding(
               padding: const EdgeInsets.only(top: 16.0, left: 16),
               child: Align(
@@ -100,6 +144,31 @@ class _OfflineTransactionFormState extends State<OfflineTransactionForm> {
                       color: black, fontWeight: FontWeight.w500, fontSize: 14),
                 ),
               ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Radio<String>(
+                  value: 'Received',
+                  groupValue: _selectedValue,
+                  onChanged: (String? value) {
+                    setState(() {
+                      _selectedValue = value;
+                    });
+                  },
+                ),
+                Text('Received'),
+                Radio<String>(
+                  value: 'Gave',
+                  groupValue: _selectedValue,
+                  onChanged: (String? value) {
+                    setState(() {
+                      _selectedValue = value;
+                    });
+                  },
+                ),
+                Text('Gave'),
+              ],
             ),
             Container(
               margin: const EdgeInsets.only(left: 10, right: 10),
@@ -118,20 +187,9 @@ class _OfflineTransactionFormState extends State<OfflineTransactionForm> {
                     border: OutlineInputBorder(
                         borderSide: BorderSide(color: borderColor)),
                     hintText: "Transaction Amount",
-                    labelText: "\$345",
+                    labelText: "Amount",
                     hintStyle:
                         GoogleFonts.dmSans(color: colorwhite, fontSize: 12)),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 16.0, left: 16),
-              child: Align(
-                alignment: AlignmentDirectional.topStart,
-                child: Text(
-                  'Notes',
-                  style: GoogleFonts.plusJakartaSans(
-                      color: black, fontWeight: FontWeight.w500, fontSize: 14),
-                ),
               ),
             ),
             Container(
@@ -139,7 +197,7 @@ class _OfflineTransactionFormState extends State<OfflineTransactionForm> {
               padding: const EdgeInsets.all(8),
               child: TextFormField(
                 controller: _notesController,
-                maxLines: 3,
+                maxLines: 1,
                 style: GoogleFonts.dmSans(color: black),
                 decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(
@@ -150,19 +208,8 @@ class _OfflineTransactionFormState extends State<OfflineTransactionForm> {
                         borderSide: BorderSide(color: borderColor)),
                     border: OutlineInputBorder(
                         borderSide: BorderSide(color: borderColor)),
-                    hintText: "Notes",
+                    hintText: "Description",
                     hintStyle: GoogleFonts.dmSans(color: black, fontSize: 12)),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 16.0, left: 16),
-              child: Align(
-                alignment: AlignmentDirectional.topStart,
-                child: Text(
-                  'Date',
-                  style: GoogleFonts.plusJakartaSans(
-                      color: black, fontWeight: FontWeight.w500, fontSize: 14),
-                ),
               ),
             ),
             Container(
@@ -176,7 +223,7 @@ class _OfflineTransactionFormState extends State<OfflineTransactionForm> {
                 style: GoogleFonts.dmSans(color: black),
                 decoration: InputDecoration(
                     suffixIcon: Icon(
-                      Icons.calendar_today,
+                      Icons.keyboard_arrow_down,
                       color: black,
                     ),
                     enabledBorder: OutlineInputBorder(
@@ -188,6 +235,34 @@ class _OfflineTransactionFormState extends State<OfflineTransactionForm> {
                     border: OutlineInputBorder(
                         borderSide: BorderSide(color: borderColor)),
                     hintText: "Date",
+                    labelText: "Date",
+                    hintStyle: GoogleFonts.dmSans(color: black, fontSize: 12)),
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.only(left: 10, right: 10),
+              padding: const EdgeInsets.all(8),
+              child: TextFormField(
+                onTap: () {
+                  _selectDateEnd(); // Call Function that has showDatePicker()
+                },
+                controller: _dateControllerEnd,
+                style: GoogleFonts.dmSans(color: black),
+                decoration: InputDecoration(
+                    suffixIcon: Icon(
+                      Icons.keyboard_arrow_down,
+                      color: black,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: borderColor)),
+                    errorBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: borderColor)),
+                    focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: borderColor)),
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide(color: borderColor)),
+                    hintText: "Due Date",
+                    labelText: "Due Date",
                     hintStyle: GoogleFonts.dmSans(color: black, fontSize: 12)),
               ),
             ),
@@ -206,16 +281,58 @@ class _OfflineTransactionFormState extends State<OfflineTransactionForm> {
                     ),
                   ),
                   Text(
-                    'Activate',
+                    'Activate Premium',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.inter(
-                      color: buttonColor,
+                      color: g,
                       fontSize: 10,
                       fontWeight: FontWeight.w400,
                     ),
                   ),
                 ],
               ),
+            ),
+            CheckboxListTile(
+              title: Text(
+                'SMS, WhatsApp, or Email.',
+                textAlign: TextAlign.start,
+                style: GoogleFonts.inter(
+                  color: black,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+              controlAffinity: ListTileControlAffinity.leading,
+              autofocus: false,
+              checkColor: black,
+              selected: _value,
+              value: _value,
+              onChanged: (bool? value) {
+                setState(() {
+                  _value = value!;
+                });
+              },
+            ),
+            CheckboxListTile(
+              controlAffinity: ListTileControlAffinity.leading,
+              title: Text(
+                'Remainders Setup (Premium Feature)',
+                textAlign: TextAlign.start,
+                style: GoogleFonts.inter(
+                  color: black,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+              autofocus: false,
+              checkColor: black,
+              selected: _value,
+              value: _value,
+              onChanged: (bool? value) {
+                setState(() {
+                  _value = value!;
+                });
+              },
             ),
             const SizedBox(
               height: 10,
@@ -227,9 +344,10 @@ class _OfflineTransactionFormState extends State<OfflineTransactionForm> {
                 : SaveButton(
                     title: "Save",
                     onTap: () async {
-                      if (selectedContacts.isEmpty) {
+                      if (selectedContactId == null ||
+                          selectedContactName == null) {
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text("At least one contact is required")));
+                            content: Text("A contact must be selected")));
                         return;
                       } else if (_amountController.text.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -249,15 +367,15 @@ class _OfflineTransactionFormState extends State<OfflineTransactionForm> {
                         });
 
                         DatabaseMethod dbMethod = DatabaseMethod();
-                        for (var contact in selectedContacts) {
-                          await dbMethod.inserttransactionsform({
-                            'amount': int.parse(_amountController.text),
-                            'notes': _notesController.text,
-                            'date': _dateController.text.trim(),
-                            'contact_id': contact['id'],
-                            'contact_name': contact['name'],
-                          });
-                        }
+                        await dbMethod.inserttransactionsform({
+                          'amount': int.parse(_amountController.text),
+                          'notes': _notesController.text,
+                          'date': _dateController.text.trim(),
+                          "duedate": _dateControllerEnd.text.trim(),
+                          'contact_id': int.parse(selectedContactId!),
+                          'contact_name': selectedContactName!,
+                          'status': _selectedValue,
+                        });
 
                         setState(() {
                           _isLoading = false;
@@ -289,56 +407,18 @@ class _OfflineTransactionFormState extends State<OfflineTransactionForm> {
     }
   }
 
-  void _showContactDialog() {
-    showDialog<void>(
+  void _selectDateEnd() async {
+    DateTime? pickedDate = await showDatePicker(
       context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Select Contacts'),
-          content: StatefulBuilder(
-            builder: (BuildContext context, StateSetter setState) {
-              return SingleChildScrollView(
-                child: Column(
-                  children: [
-                    for (var contact in contacts)
-                      CheckboxListTile(
-                        title: Text(contact['name']),
-                        value: selectedContacts.contains(contact),
-                        onChanged: (bool? value) {
-                          setState(() {
-                            if (value!) {
-                              selectedContacts.add(contact);
-                            } else {
-                              selectedContacts.remove(contact);
-                            }
-                          });
-                        },
-                      ),
-                  ],
-                ),
-              );
-            },
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (builder) => AddContactOffline()));
-              },
-              child: Text('Add New Contact'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('OK'),
-            ),
-          ],
-        );
-      },
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
     );
+
+    if (pickedDate != null && pickedDate != DateTime.now()) {
+      setState(() {
+        _dateControllerEnd.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+      });
+    }
   }
 }
