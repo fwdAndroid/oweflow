@@ -6,6 +6,7 @@ import 'package:oweflow/offline_mode/dashboard/records/lenders_offline.dart';
 import 'package:oweflow/offline_mode/featuers/offline_pre_features.dart';
 import 'package:oweflow/offline_mode/off_line_edit/edit_lend_page_offline.dart';
 import 'package:oweflow/screens/accountpages/currency_exchange.dart';
+import 'package:oweflow/screens/view/view_offline_transaction.dart';
 import 'package:oweflow/utils/colors.dart';
 
 class OfflineHomePage extends StatefulWidget {
@@ -306,6 +307,15 @@ class _OfflineHomePageState extends State<OfflineHomePage> {
                             elevation: 1,
                             color: colorwhite,
                             child: ListTile(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (builder) =>
+                                            ViewOfflineTransaction(
+                                              document: transaction,
+                                            )));
+                              },
                               title: Text(
                                 transaction['contact_name'],
                                 style: GoogleFonts.plusJakartaSans(

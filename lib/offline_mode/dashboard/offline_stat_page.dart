@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:oweflow/localdatabase/local_db.dart'; // Ensure this import is correct
 import 'package:oweflow/screens/accountpages/premium_features.dart';
 import 'package:oweflow/screens/view/view_offline_transaction.dart';
-import 'package:oweflow/screens/view/view_transaction.dart';
 import 'package:oweflow/utils/colors.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:intl/intl.dart';
@@ -38,9 +37,14 @@ class _StatsPageOfflineState extends State<StatsPageOffline> {
       List<Map<String, dynamic>> completedTransactions =
           await dbMethod.getAllCompletedTransactions();
 
+      // Filter out closed transactions
+      List<Map<String, dynamic>> openTransactions = allTransactions
+          .where((transaction) => transaction['type'] != 'Closed')
+          .toList();
+
       setState(() {
         eventDates = [
-          ...allTransactions
+          ...openTransactions
               .map((transaction) => DateTime.parse(transaction['date']))
               .toList(),
           ...completedTransactions
@@ -61,8 +65,13 @@ class _StatsPageOfflineState extends State<StatsPageOffline> {
       List<Map<String, dynamic>> completedTransactions =
           await dbMethod.getAllCompletedTransactions();
 
+      // Filter out closed transactions
+      List<Map<String, dynamic>> openTransactions = allTransactions
+          .where((transaction) => transaction['type'] != 'Closed')
+          .toList();
+
       setState(() {
-        transactions = [...allTransactions, ...completedTransactions];
+        transactions = [...openTransactions, ...completedTransactions];
       });
     } catch (e) {
       print('Error fetching transactions: $e');
@@ -73,7 +82,9 @@ class _StatsPageOfflineState extends State<StatsPageOffline> {
   Widget build(BuildContext context) {
     List<Map<String, dynamic>> filteredTransactions = transactions
         .where((transaction) =>
-            DateTime.parse(transaction['date']).day == selectedDate.day)
+            DateTime.parse(transaction['date']).day == selectedDate.day &&
+            transaction['type'] !=
+                'Closed') // Ensure "Closed" transactions are not displayed
         .toList();
 
     return Scaffold(
@@ -209,7 +220,7 @@ class _StatsPageOfflineState extends State<StatsPageOffline> {
         startTime: date,
         endTime: date.add(Duration(hours: 1)),
         isAllDay: true,
-        color: Colors.orange,
+        color: buttonColor,
       ));
     }
 
