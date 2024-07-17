@@ -375,6 +375,7 @@ class _OfflineTransactionFormState extends State<OfflineTransactionForm> {
                           'contact_id': int.parse(selectedContactId!),
                           'contact_name': selectedContactName!,
                           'status': _selectedValue,
+                          'type': 'Open'
                         });
 
                         setState(() {

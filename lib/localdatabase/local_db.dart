@@ -20,10 +20,10 @@ class DatabaseMethod {
           "CREATE TABLE IF NOT EXISTS contacts(id INTEGER PRIMARY KEY, name TEXT)",
         );
         await db.execute(
-          "CREATE TABLE IF NOT EXISTS transactionsform(id INTEGER PRIMARY KEY, amount INTEGER, notes TEXT,status TEXT ,date TEXT, duedate Text, contact_id INTEGER, contact_name TEXT, FOREIGN KEY(contact_id) REFERENCES contacts(id))",
+          "CREATE TABLE IF NOT EXISTS transactionsform(id INTEGER PRIMARY KEY, amount INTEGER, notes TEXT,status TEXT ,date TEXT, duedate Text, type TEXT ,contact_id INTEGER, contact_name TEXT, FOREIGN KEY(contact_id) REFERENCES contacts(id))",
         );
         await db.execute(
-          "CREATE TABLE IF NOT EXISTS completedtransactions(id INTEGER PRIMARY KEY, amount INTEGER, notes TEXT, date TEXT, contact_id INTEGER, contact_name TEXT, FOREIGN KEY(contact_id) REFERENCES contacts(id))",
+          "CREATE TABLE IF NOT EXISTS completedtransactions(id INTEGER PRIMARY KEY, amount INTEGER, notes TEXT,status TEXT ,date TEXT, duedate Text, type TEXT,contact_id INTEGER, contact_name TEXT, FOREIGN KEY(contact_id) REFERENCES contacts(id))",
         );
       },
       onUpgrade: (db, oldVersion, newVersion) async {
@@ -64,8 +64,7 @@ class DatabaseMethod {
     );
   }
 
-  Future<void> insertCompletedTransaction(
-      Map<String, dynamic> transaction) async {
+  insertCompletedTransaction(Map<String, dynamic> transaction) async {
     final db = await database;
     await db.insert(
       'completedtransactions',

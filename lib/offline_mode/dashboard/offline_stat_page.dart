@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oweflow/localdatabase/local_db.dart'; // Ensure this import is correct
 import 'package:oweflow/screens/accountpages/premium_features.dart';
+import 'package:oweflow/screens/view/view_offline_transaction.dart';
+import 'package:oweflow/screens/view/view_transaction.dart';
 import 'package:oweflow/utils/colors.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:intl/intl.dart';
@@ -167,16 +169,25 @@ class _StatsPageOfflineState extends State<StatsPageOffline> {
                         var transaction = filteredTransactions[index];
                         return Card(
                           child: ListTile(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (builder) =>
+                                          ViewOfflineTransaction(
+                                            document: transaction,
+                                          )));
+                            },
                             title: Text(
-                              'Name: ${transaction['contact_name']}',
+                              '${transaction['contact_name']}',
                               style: TextStyle(color: textColor),
                             ),
                             subtitle: Text(
-                              'Amount: ${transaction['amount'].toString()}',
+                              ' ${transaction['amount'].toString()}' + "\$",
                               style: TextStyle(color: textColor),
                             ),
                             trailing: Text(
-                              transaction['date'].toString().toUpperCase(),
+                              transaction['status'].toString().toUpperCase(),
                               style: TextStyle(color: textColor),
                             ),
                           ),
