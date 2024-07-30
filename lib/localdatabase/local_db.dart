@@ -53,13 +53,30 @@ class DatabaseMethod {
     );
   }
 
-  Future<void> insertSchedule(Map<String, dynamic> event) async {
+  Future<void> insertSchedule(
+    String contactId,
+    int amount,
+    String notes,
+    String contactName,
+    String date,
+    String recurrence,
+    String remainders,
+  ) async {
     final db = await database;
     await db.insert(
       'schedules',
-      event,
+      {
+        'contact_id': contactId,
+        'amount': amount,
+        'notes': notes,
+        'date': date,
+        'listRecrudesce': recurrence,
+        'listRemainders': remainders,
+        'contact_name': contactName,
+      },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+    print("Schedule inserted into the database");
   }
 
   Future<List<Map<String, dynamic>>> getAllTransactions() async {
@@ -76,6 +93,15 @@ class DatabaseMethod {
     final db = await database;
     await db.delete(
       'transactionsform',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<void> deleteSchedules(int id) async {
+    final db = await database;
+    await db.delete(
+      'schedules',
       where: 'id = ?',
       whereArgs: [id],
     );

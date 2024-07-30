@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:oweflow/localdatabase/local_db.dart';
@@ -16,7 +15,7 @@ class AddScheduleOffline extends StatefulWidget {
 }
 
 class _AddScheduleOfflineState extends State<AddScheduleOffline> {
-  TextEditingController _emailController = TextEditingController();
+  TextEditingController _amountController = TextEditingController();
   String dropdownValue = "Does not repeat";
   String remainders = "Disabled";
   bool isLoading = false;
@@ -38,7 +37,6 @@ class _AddScheduleOfflineState extends State<AddScheduleOffline> {
   String? selectedContactId;
   String? selectedContactName;
 
-  List<String> selectedContacts = [];
   @override
   void initState() {
     super.initState();
@@ -102,7 +100,7 @@ class _AddScheduleOfflineState extends State<AddScheduleOffline> {
                               selectedContactId = contact['id'].toString();
                               selectedContactName = contact['name'];
                             });
-                            print(selectedContactName);
+                            print("Selected Contact: $selectedContactName");
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -159,7 +157,7 @@ class _AddScheduleOfflineState extends State<AddScheduleOffline> {
                   width: 130,
                   child: TextFormField(
                     keyboardType: TextInputType.number,
-                    controller: _emailController,
+                    controller: _amountController,
                     style: GoogleFonts.dmSans(color: black),
                     decoration: InputDecoration(
                         enabledBorder: OutlineInputBorder(
@@ -244,7 +242,6 @@ class _AddScheduleOfflineState extends State<AddScheduleOffline> {
                         height: 0,
                       ),
                       onChanged: (String? value) {
-                        // This is called when the user selects an item.
                         setState(() {
                           dropdownValue = value!;
                         });
@@ -295,7 +292,7 @@ class _AddScheduleOfflineState extends State<AddScheduleOffline> {
                         borderSide: BorderSide(color: borderColor)),
                     border: OutlineInputBorder(
                         borderSide: BorderSide(color: borderColor)),
-                    hintText: "Dates",
+                    hintText: "22/12/2022",
                     hintStyle: GoogleFonts.dmSans(color: black, fontSize: 12)),
               ),
             ),
@@ -303,10 +300,13 @@ class _AddScheduleOfflineState extends State<AddScheduleOffline> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  margin: EdgeInsets.only(bottom: 10, left: 18, top: 10),
+                  margin: EdgeInsets.only(bottom: 10, left: 18),
                   child: Text(
                     "Remainders",
-                    style: GoogleFonts.inter(color: black),
+                    style: GoogleFonts.plusJakartaSans(
+                        color: black,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14),
                   ),
                 ),
                 Container(
@@ -327,7 +327,6 @@ class _AddScheduleOfflineState extends State<AddScheduleOffline> {
                         height: 0,
                       ),
                       onChanged: (String? value) {
-                        // This is called when the user selects an item.
                         setState(() {
                           remainders = value!;
                         });
@@ -345,64 +344,71 @@ class _AddScheduleOfflineState extends State<AddScheduleOffline> {
                     )),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SaveButton(
-                  onTap: () async {
-                    if (_emailController.text.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Amount is Required")));
-                    } else if (_dateController.text.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Date is Required")));
-                    } else {
+            const SizedBox(
+              height: 20,
+            ),
+            isLoading
+                ? CircularProgressIndicator()
+                : SaveButton(
+                    title: "Save",
+                    onTap: () async {
+                      if (selectedContactId == null) {
+                        // Add your logic to handle if no contact is selected
+                        print("No contact selected");
+                        return;
+                      }
+
+                      DatabaseMethod dbMethod = DatabaseMethod();
+
+                      print(
+                          "Adding Schedule for Contact ID: $selectedContactId");
+                      print("Amount: ${_amountController.text}");
+                      print("Notes: ${_notesController.text}");
+                      print("Date: ${_dateController.text}");
+                      print("Recurrence: $dropdownValue");
+                      print("Remainders: $remainders");
+                      print("contactName:$selectedContactName");
+
                       setState(() {
                         isLoading = true;
                       });
 
-                      DatabaseMethod dbMethod = DatabaseMethod();
-                      await dbMethod.insertSchedule({
-                        'amount': int.parse(_emailController.text),
-                        'notes': _notesController.text,
-                        'date': _dateController.text.trim(),
-                        'contact_id': int.parse(selectedContactId!),
-                        'contact_name': selectedContactName!,
-                        'listRemainders': remainders,
-                        'listRecrudesce': dropdownValue,
-                      });
-
-                      setState(() {
-                        isLoading = false;
-                      });
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (builder) => OfflineDashboard()));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Schedule is Created")));
-                    }
-                  },
-                  title: "Save"),
-            ),
+                      try {
+                        await dbMethod.insertSchedule(
+                            selectedContactId!,
+                            int.parse(_amountController.text),
+                            _notesController.text,
+                            _dateController.text,
+                            dropdownValue,
+                            remainders,
+                            selectedContactName!);
+                        print("Schedule Added Successfully");
+                      } catch (e) {
+                        print("Error adding schedule: $e");
+                      } finally {
+                        setState(() {
+                          isLoading = false;
+                        });
+                      }
+                    },
+                  )
           ],
         ),
       ),
     );
   }
 
-//Functions
-  void _selectDate() async {
-    DateTime? pickedDate = await showDatePicker(
+  Future<void> _selectDate() async {
+    DateTime? selectedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
 
-    if (pickedDate != null && pickedDate != DateTime.now()) {
-      // Update the text field with the selected date
+    if (selectedDate != null) {
       setState(() {
-        _dateController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+        _dateController.text = DateFormat('dd/MM/yyyy').format(selectedDate);
       });
     }
   }
