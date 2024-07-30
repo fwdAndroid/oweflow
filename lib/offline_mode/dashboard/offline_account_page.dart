@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oweflow/offline_mode/featuers/offline_pre_features.dart';
-import 'package:oweflow/screens/accountpages/schedueles_features.dart';
-import 'package:oweflow/selection_screen.dart';
+import 'package:oweflow/offline_mode/schedule/schedule_features_offline.dart';
 import 'package:oweflow/utils/colors.dart';
 
 class AccountPageOffline extends StatefulWidget {
@@ -71,7 +70,7 @@ class _AccountPageOfflineState extends State<AccountPageOffline> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (builder) => SchedulesFeatures()));
+                          builder: (builder) => ScheduleFeaturesOffline()));
                 },
                 leading: Icon(
                   Icons.schedule,

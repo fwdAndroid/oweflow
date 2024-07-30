@@ -25,6 +25,9 @@ class DatabaseMethod {
         await db.execute(
           "CREATE TABLE IF NOT EXISTS completedtransactions(id INTEGER PRIMARY KEY, amount INTEGER, notes TEXT,status TEXT ,date TEXT, duedate Text, type TEXT,contact_id INTEGER, contact_name TEXT, FOREIGN KEY(contact_id) REFERENCES contacts(id))",
         );
+        await db.execute(
+          "CREATE TABLE IF NOT EXISTS schedules(id INTEGER PRIMARY KEY, amount INTEGER, notes TEXT ,date TEXT, listRecrudesce Text, listRemainders TEXT,contact_id INTEGER, contact_name TEXT, FOREIGN KEY(contact_id) REFERENCES contacts(id))",
+        );
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 1) {}
@@ -53,6 +56,11 @@ class DatabaseMethod {
   Future<List<Map<String, dynamic>>> getAllTransactions() async {
     final db = await database;
     return await db.query('transactionsform');
+  }
+
+  Future<List<Map<String, dynamic>>> getSchedules() async {
+    final db = await database;
+    return await db.query('schedules');
   }
 
   Future<void> deleteTransaction(int id) async {

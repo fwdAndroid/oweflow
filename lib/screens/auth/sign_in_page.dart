@@ -18,7 +18,7 @@ class _SignInPageState extends State<SignInPage> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
-  bool _obscureText = true;
+  bool _obscureText = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
