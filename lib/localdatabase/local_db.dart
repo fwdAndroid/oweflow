@@ -28,6 +28,9 @@ class DatabaseMethod {
         await db.execute(
           "CREATE TABLE IF NOT EXISTS schedules(id INTEGER PRIMARY KEY, amount INTEGER, notes TEXT ,date TEXT, listRecrudesce Text, listRemainders TEXT,contact_id INTEGER, contact_name TEXT, FOREIGN KEY(contact_id) REFERENCES contacts(id))",
         );
+        await db.execute(
+          "CREATE TABLE IF NOT EXISTS goals(id INTEGER PRIMARY KEY, amount INTEGER, notes TEXT, name TEXT, date TEXT)",
+        );
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 1) {}
@@ -79,6 +82,26 @@ class DatabaseMethod {
     print("Schedule inserted into the database");
   }
 
+  Future<void> insertGoal(
+    int amount,
+    String notes,
+    String name,
+    String date,
+  ) async {
+    final db = await database;
+    await db.insert(
+      'goals',
+      {
+        'name': name,
+        'amount': amount,
+        'notes': notes,
+        'date': date,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+    print("Schedule inserted into the database");
+  }
+
   Future<List<Map<String, dynamic>>> getAllTransactions() async {
     final db = await database;
     return await db.query('transactionsform');
@@ -87,6 +110,11 @@ class DatabaseMethod {
   Future<List<Map<String, dynamic>>> getSchedules() async {
     final db = await database;
     return await db.query('schedules');
+  }
+
+  Future<List<Map<String, dynamic>>> getGoals() async {
+    final db = await database;
+    return await db.query('goals');
   }
 
   Future<void> deleteTransaction(int id) async {
@@ -102,6 +130,15 @@ class DatabaseMethod {
     final db = await database;
     await db.delete(
       'schedules',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<void> deleteGoals(int id) async {
+    final db = await database;
+    await db.delete(
+      'goals',
       where: 'id = ?',
       whereArgs: [id],
     );

@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:oweflow/localdatabase/local_db.dart';
 import 'package:oweflow/offline_mode/offline_contact/offline_add_contact.dart';
-import 'package:oweflow/offline_mode/offline_dashboard.dart';
 import 'package:oweflow/utils/buttons.dart';
 import 'package:oweflow/utils/colors.dart';
 

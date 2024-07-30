@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:oweflow/localdatabase/local_db.dart';
 import 'package:oweflow/offline_mode/featuers/add_goals_offline.dart';
-import 'package:oweflow/utils/buttons.dart';
+import 'package:oweflow/screens/view/view_goals_offline.dart';
 import 'package:oweflow/utils/colors.dart';
 
 class FinancialGoalsOffline extends StatefulWidget {
@@ -12,190 +13,207 @@ class FinancialGoalsOffline extends StatefulWidget {
 }
 
 class _FinancialGoalsOfflineState extends State<FinancialGoalsOffline> {
+  List<Map<String, dynamic>> transactions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchTransactions();
+  }
+
+  Future<void> fetchTransactions() async {
+    try {
+      DatabaseMethod dbMethod = DatabaseMethod();
+      List<Map<String, dynamic>> fetchedTransactions =
+          await dbMethod.getGoals();
+      setState(() {
+        transactions = fetchedTransactions;
+      });
+    } catch (e) {
+      print('Error fetching transactions: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: Icon(
-                Icons.arrow_back,
-                color: black,
-              )),
-          centerTitle: true,
-          title: Text(
-            "Financial Goals",
-            style: GoogleFonts.plusJakartaSans(
-                color: black, fontWeight: FontWeight.w500, fontSize: 16),
+      floatingActionButton: FloatingActionButton(
+          backgroundColor: buttonColor,
+          child: Icon(
+            Icons.add,
+            color: colorwhite,
           ),
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (builder) => AddGoalsOffline()));
+          }),
+      appBar: AppBar(
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(
+              Icons.arrow_back,
+              color: black,
+            )),
+        centerTitle: true,
+        title: Text(
+          "Financial Goals",
+          style: GoogleFonts.plusJakartaSans(
+              color: black, fontWeight: FontWeight.w500, fontSize: 16),
         ),
-        body: Column(
-          children: [
-            // Padding(
-            //   padding: const EdgeInsets.all(8.0),
-            //   child: ListTile(
-            //     title: Text(
-            //       'August 2022',
-            //       style: GoogleFonts.dmSans(
-            //         color: black,
-            //         fontSize: 14,
-            //         fontWeight: FontWeight.w400,
-            //         height: 0.14,
-            //         letterSpacing: 0.42,
-            //       ),
-            //     ),
-            //     subtitle: Row(
-            //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //       children: [
-            //         Text(
-            //           '\$47,297',
-            //           style: GoogleFonts.dmSans(
-            //             color: b,
-            //             fontSize: 42,
-            //             fontWeight: FontWeight.w700,
-            //           ),
-            //         ),
-            //         ElevatedButton(
-            //           onPressed: () {},
-            //           child: Text(
-            //             "Month",
-            //             style: TextStyle(color: black),
-            //           ),
-            //           style: ElevatedButton.styleFrom(
-            //             shape: RoundedRectangleBorder(
-            //                 borderRadius: BorderRadius.circular(10)),
-            //             backgroundColor: textColor,
-            //           ),
-            //         )
-            //       ],
-            //     ),
-            //   ),
-            // ),
-            const SizedBox(
-              height: 15,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Budget list',
-                    style: GoogleFonts.dmSans(
-                      color: black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      height: 0.09,
+      ),
+      body: Column(
+        children: [
+          const SizedBox(height: 40),
+          SizedBox(
+            height: MediaQuery.of(context).size.height / 2.3,
+            child: transactions.isEmpty
+                ? Center(
+                    child: Text(
+                      'No Goals available',
+                      style: GoogleFonts.plusJakartaSans(
+                        color: black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
-                  ),
-                  Text(
-                    'Manage',
-                    style: GoogleFonts.dmSans(
-                      color: Color(0xFFE84040),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      height: 0.12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SizedBox(
-                  height: MediaQuery.of(context).size.height / 3,
-                  child: ListView.builder(
-                      itemBuilder: (BuildContext context, int index) {
-                    return Column(
-                      children: [
-                        ListTile(
-                          leading: Text(
-                            " data['amount']",
-                            style: TextStyle(
-                                color: black, fontWeight: FontWeight.w600),
-                          ),
-                          title: Text(
-                            " data['name']",
-                            style: TextStyle(
-                                color: black, fontWeight: FontWeight.w600),
-                          ),
-                          subtitle: Text(
-                            "data['date']",
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                          trailing: IconButton(
-                              onPressed: () async {
-                                showDialog<void>(
-                                  context: context,
-                                  barrierDismissible:
-                                      false, // user must tap button!
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: Text('Delete Alert'),
-                                      content: Column(
-                                        children: [
-                                          Text(
-                                            "Do you want to delete the goal ?",
-                                            style: TextStyle(color: black),
-                                          )
-                                        ],
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () async {
-                                            // await FirebaseFirestore
-                                            //     .instance
-                                            //     .collection(
-                                            //         "goals")
-                                            //     .doc(data['uuid'])
-                                            //     .delete();
-                                            // Navigator.push(
-                                            //     context,
-                                            //     MaterialPageRoute(
-                                            //         builder:
-                                            //             (builder) =>
-                                            //                 MainDashboard()));
-                                          },
-                                          child: Text('Yes'),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: Text('No'),
-                                        ),
-                                      ],
-                                    );
-                                  },
+                  )
+                : ListView.builder(
+                    itemCount: transactions.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final transaction = transactions[index];
+
+                      return Dismissible(
+                        key: Key(transaction['id'].toString()),
+                        confirmDismiss: (DismissDirection direction) async {
+                          if (direction == DismissDirection.endToStart) {
+                            return await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Confirm"),
+                                  content: Text(
+                                      "Are you sure you want to delete this item?"),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(false),
+                                      child: Text("Cancel"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(true),
+                                      child: Text("Delete"),
+                                    ),
+                                  ],
                                 );
                               },
-                              icon: Icon(
-                                Icons.delete,
-                                color: Colors.red,
-                              )),
+                            );
+                          } else if (direction == DismissDirection.startToEnd) {
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //     builder: (context) =>
+                            //         EditLendPageOffline(document: transaction),
+                            //   ),
+                            // );
+                            return false;
+                          }
+                          return false;
+                        },
+                        onDismissed: (DismissDirection direction) async {
+                          if (direction == DismissDirection.endToStart) {
+                            DatabaseMethod dbMethod = DatabaseMethod();
+                            await dbMethod.deleteGoals(transaction['id']);
+                            setState(() {
+                              transactions.removeAt(index);
+                            });
+                          }
+                        },
+                        background: Container(
+                          color: Colors.green,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 16.0),
+                              child: Icon(Icons.edit, color: Colors.white),
+                            ),
+                          ),
                         ),
-                        Divider(
-                          color: black.withOpacity(.2),
-                        )
-                      ],
-                    );
-                  })),
-            ),
-            Flexible(child: Container()),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SaveButton(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (builder) => AddGoalsOffline()));
-                  },
-                  title: "Add New Goals"),
-            )
-          ],
-        ));
+                        secondaryBackground: Container(
+                          color: Colors.red,
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 16.0),
+                              child: Icon(Icons.delete, color: Colors.white),
+                            ),
+                          ),
+                        ),
+                        child: Card(
+                          elevation: 1,
+                          color: colorwhite,
+                          child: ListTile(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (builder) =>
+                                      ViewGoalsOffline(document: transaction),
+                                ),
+                              );
+                            },
+                            title: Text(
+                              transaction['name'].toString(),
+                              style: GoogleFonts.plusJakartaSans(
+                                color: black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  transaction['notes'],
+                                  style: GoogleFonts.plusJakartaSans(
+                                    color: black,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                Text(
+                                  transaction['date'],
+                                  style: GoogleFonts.plusJakartaSans(
+                                    color: black,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            trailing: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  '\$${transaction['amount']}',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    color: black,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
+    );
   }
 }

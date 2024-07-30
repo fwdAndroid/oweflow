@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:oweflow/screens/premiumfeatues/financialgoals.dart';
-import 'package:oweflow/services/database.dart';
+import 'package:oweflow/localdatabase/local_db.dart';
+import 'package:oweflow/offline_mode/featuers/offline_finanical_goals.dart';
 import 'package:oweflow/utils/buttons.dart';
 import 'package:oweflow/utils/colors.dart';
 
@@ -205,26 +205,42 @@ class AddGoalsOfflineOffline extends State<AddGoalsOffline> {
                           });
                         }
 
-                        String res = await Database().addGoal(
-                            name: _goalName.text.trim(),
-                            notes: _goalNote.text.trim() ?? "",
-                            amount: _goalAmount.text.trim(),
-                            date: _goalDate.text);
+                        DatabaseMethod dbMethod = DatabaseMethod();
 
+                        print("Amount: ${_goalAmount.text}");
+                        print("Notes: ${_goalNote.text}");
+                        print("Name: ${_goalName.text}");
+                        print("Date: ${_goalDate.text}");
+
+                        setState(() {
+                          isLoading = true;
+                        });
+
+                        try {
+                          await dbMethod.insertGoal(
+                            int.parse(_goalAmount.text),
+                            _goalNote.text,
+                            _goalName.text,
+                            _goalDate.text,
+                          );
+                          print("Goals Added Successfully");
+                        } catch (e) {
+                          print("Error adding schedule: $e");
+                        } finally {
+                          setState(() {
+                            isLoading = false;
+                          });
+                        }
                         setState(() {
                           isLoading = false;
                         });
-                        if (res != 'sucess') {
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(SnackBar(content: Text(res)));
-                        } else {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (builder) => FinancialGoals()));
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Goals are added")));
-                        }
+
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (builder) => FinancialGoalsOffline()));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Goals are added")));
                       },
                       title: "Add New Goals")
             ],
