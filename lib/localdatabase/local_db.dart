@@ -53,6 +53,15 @@ class DatabaseMethod {
     );
   }
 
+  Future<void> insertSchedule(Map<String, dynamic> event) async {
+    final db = await database;
+    await db.insert(
+      'schedules',
+      event,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
   Future<List<Map<String, dynamic>>> getAllTransactions() async {
     final db = await database;
     return await db.query('transactionsform');
@@ -105,7 +114,6 @@ class DatabaseMethod {
       transaction,
       where: 'id = ?',
       whereArgs: [transaction['id']],
-      conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 

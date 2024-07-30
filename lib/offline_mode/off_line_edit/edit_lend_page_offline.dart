@@ -261,7 +261,7 @@ class _EditLendPageOfflineState extends State<EditLendPageOffline> {
       await dbMethod.updateTransaction({
         'id': widget.document['id'],
         'amount': int.parse(_amountController.text),
-        'contact': _contactController.text,
+        'contact_name': _contactController.text,
         'notes': _notesController.text,
         'date': _dateController.text,
         'duedate': _dateControllerEnd.text,

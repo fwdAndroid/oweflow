@@ -238,7 +238,6 @@ class _AddScheduleOfflineState extends State<AddScheduleOffline> {
                         Icons.arrow_drop_down,
                         color: black,
                       ),
-                      dropdownColor: Colors.transparent,
                       style: TextStyle(color: Colors.black),
                       elevation: 16,
                       underline: Container(
@@ -359,6 +358,17 @@ class _AddScheduleOfflineState extends State<AddScheduleOffline> {
                     } else {
                       setState(() {
                         isLoading = true;
+                      });
+
+                      DatabaseMethod dbMethod = DatabaseMethod();
+                      await dbMethod.insertSchedule({
+                        'amount': int.parse(_emailController.text),
+                        'notes': _notesController.text,
+                        'date': _dateController.text.trim(),
+                        'contact_id': int.parse(selectedContactId!),
+                        'contact_name': selectedContactName!,
+                        'listRemainders': remainders,
+                        'listRecrudesce': dropdownValue,
                       });
 
                       setState(() {
