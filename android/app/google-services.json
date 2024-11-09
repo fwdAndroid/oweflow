@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "810073043255",
+    "project_id": "oweflow-80c7a",
+    "storage_bucket": "oweflow-80c7a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:810073043255:android:aca230c7627496ed23eab2",
+        "android_client_info": {
+          "package_name": "com.example.oweflow"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDF4jIMVsfH1OS79uDqjtchqBw685ZH5G0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:810073043255:android:c0e7b7508226f46423eab2",
+        "android_client_info": {
+          "package_name": "com.example.oweflow_web"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDF4jIMVsfH1OS79uDqjtchqBw685ZH5G0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
