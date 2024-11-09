@@ -176,7 +176,7 @@ class _WalletPageState extends State<WalletPage> {
           Text(
             "Closed Transactions",
             style: GoogleFonts.inter(
-              color: colorwhite,
+              color: black,
               fontSize: 16,
               fontWeight: FontWeight.w400,
               height: 0,
@@ -211,102 +211,103 @@ class _WalletPageState extends State<WalletPage> {
                           documents[index].data() as Map<String, dynamic>;
 
                       return Dismissible(
-                          key: Key(data[index].id),
-                          confirmDismiss: (DismissDirection direction) async {
-                            if (direction == DismissDirection.endToStart) {
-                              return await showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Text("Confirm"),
-                                    content: Text(
-                                        "Are you sure you want to delete this item?"),
-                                    actions: <Widget>[
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(false),
-                                        child: Text("Cancel"),
-                                      ),
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(true),
-                                        child: Text("Delete"),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            } else if (direction ==
-                                DismissDirection.startToEnd) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      EditLendPage(document: data),
-                                ),
-                              );
-                              return false;
-                            }
+                        key: Key(documents[index]
+                            .id), // Use documents[index].id here
+                        confirmDismiss: (DismissDirection direction) async {
+                          if (direction == DismissDirection.endToStart) {
+                            return await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Confirm"),
+                                  content: Text(
+                                      "Are you sure you want to delete this item?"),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(false),
+                                      child: Text("Cancel"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(true),
+                                      child: Text("Delete"),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          } else if (direction == DismissDirection.startToEnd) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    EditLendPage(document: data),
+                              ),
+                            );
                             return false;
-                          },
-                          onDismissed: (DismissDirection direction) async {
-                            if (direction == DismissDirection.endToStart) {
-                              await FirebaseFirestore.instance
-                                  .collection('debitTransaction')
-                                  .doc(data[index].id)
-                                  .delete();
-                              setState(() {
-                                data.remove(index);
-                              });
-                            }
-                          },
-                          background: Container(
-                              color: Colors.green,
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 16.0),
-                                  child: Icon(Icons.edit, color: Colors.white),
-                                ),
-                              )),
-                          secondaryBackground: Container(
-                              color: Colors.red,
-                              child: Align(
-                                alignment: Alignment.centerRight,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(right: 16.0),
-                                  child:
-                                      Icon(Icons.delete, color: Colors.white),
-                                ),
-                              )),
-                          child: Column(
-                            children: [
-                              ListTile(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (builder) =>
-                                                ViewTransaction(
-                                                  document: data,
-                                                )));
-                                  },
-                                  title: Text(
-                                    data['contact'],
-                                    style: TextStyle(color: black),
-                                  ),
-                                  subtitle: Text(
-                                    'Amount: ${data['date'].toString()}',
-                                    style: TextStyle(color: black),
-                                  ),
-                                  // Add more fields as needed
-                                  trailing: Text(
-                                    data['status'],
-                                    style: TextStyle(color: g),
-                                  )),
-                              Divider()
-                            ],
-                          ));
+                          }
+                          return false;
+                        },
+                        onDismissed: (DismissDirection direction) async {
+                          if (direction == DismissDirection.endToStart) {
+                            await FirebaseFirestore.instance
+                                .collection('debitTransaction')
+                                .doc(documents[index]
+                                    .id) // Use documents[index].id here
+                                .delete();
+                            setState(() {
+                              documents
+                                  .removeAt(index); // Remove the item by index
+                            });
+                          }
+                        },
+                        background: Container(
+                            color: Colors.green,
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 16.0),
+                                child: Icon(Icons.edit, color: Colors.white),
+                              ),
+                            )),
+                        secondaryBackground: Container(
+                            color: Colors.red,
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 16.0),
+                                child: Icon(Icons.delete, color: Colors.white),
+                              ),
+                            )),
+                        child: Column(
+                          children: [
+                            ListTile(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (builder) => ViewTransaction(
+                                              document: data,
+                                            )));
+                              },
+                              title: Text(
+                                data['contact'],
+                                style: TextStyle(color: black),
+                              ),
+                              subtitle: Text(
+                                'Amount: ${data['date'].toString()}',
+                                style: TextStyle(color: black),
+                              ),
+                              trailing: Text(
+                                data['status'],
+                                style: TextStyle(color: g),
+                              ),
+                            ),
+                            Divider()
+                          ],
+                        ),
+                      );
                     },
                   );
                 },
