@@ -6,7 +6,7 @@ import 'package:oweflow/screens/accountpages/noti.dart';
 import 'package:oweflow/screens/accountpages/personalprofile.dart';
 import 'package:oweflow/screens/accountpages/premium_features.dart';
 import 'package:oweflow/screens/accountpages/schedueles_features.dart';
-import 'package:oweflow/screens/auth/sign_in_page.dart';
+import 'package:oweflow/selection_screen.dart';
 import 'package:oweflow/utils/colors.dart';
 
 class AccountPage extends StatefulWidget {
@@ -263,7 +263,7 @@ class _AccountPageState extends State<AccountPage> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (builder) =>
-                                                  SignInPage()));
+                                                  SelectionScreen()));
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(SnackBar(
                                               content: Text(
